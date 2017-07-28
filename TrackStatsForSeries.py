@@ -8,22 +8,22 @@ import re
 import datetime
 from time import gmtime, strftime, localtime
 
-from apiclient import discovery
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
+#from apiclient import discovery
+#from oauth2client import client
+#from oauth2client import tools
+#from oauth2client.file import Storage
 
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
+#try:
+#    import argparse
+#    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+#except ImportError:
+#    flags = None
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/sheets.googleapis.com-python-quickstart.json
-SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
-CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'GeoGuessr Statistics Tracker'
+#SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
+#CLIENT_SECRET_FILE = 'client_secret.json'
+#APPLICATION_NAME = 'GeoGuessr Statistics Tracker'
 
 def getDate(submission):
     time = datetime.date.fromtimestamp(submission.created)
@@ -53,7 +53,7 @@ def enoughGames(scoreList):
     for score in scoreList:
         if isNumber(score):
             gamesPlayed += 1
-    if gamesPlayed > 3:
+    if gamesPlayed > 0:
         return True
     else:
         return False
@@ -65,22 +65,12 @@ def runScript():
     """
     # Get credentials to be able to access the google sheets API
 
-    """
+    
     f = open('log.txt', 'a')
     print("Script run at: " + str(strftime("%Y-%m-%d %H:%M:%S", localtime())), file=f)
-    print("Script run at: " + str(strftime("%Y-%m-%d %H:%M:%S", localtime())))
-
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
-                    'version=v4')
-    service = discovery.build('sheets', 'v4', http=http, discoveryServiceUrl=discoveryUrl)
-
-    # Set basic info about the spreadsheet
-    SHEET_ID = 'SHEET ID HERE'
-    RANGE_ENTRY = 'Entire Sub!'
-    """
+    print("Script run at: " + str(strftime("%Y-%m-%d %H:%M:%S", localtime())))  
     
+
     # Read reddit client_id and client_secret from file (to avoid accidentally publishing it)
     inputFile = open("RedditAPIAccess.txt")
     lines = []
@@ -106,10 +96,10 @@ def runScript():
     # Generate submission list which shall be used in the rest of the file
     # Necessary so that certain posts could be consistently ignored
     # Rules for ignoring post are described in the overview sheet
-    submissionList = [submission for submission in subreddit.submissions() if ('[1' in submission.title or '[2' in submission.title or '[3' in submission.title or '[4' in submission.title or '[5' in submission.title) ]
-    """subreddit.new(limit = 10)"""
+    #submissionList = [submission for submission in subreddit.submissions() if ('[1' in submission.title or '[2' in submission.title or '[3' in submission.title or '[4' in submission.title or '[5' in submission.title) ]
+    submissionList = [submission for submission in subreddit.new(limit = 10)]
 
-    subreddit.comments
+    #subreddit.comments
 
     #for submission in submissionList:
     #    for topLevelComment in submission.comments:
@@ -120,8 +110,14 @@ def runScript():
     names = set([comment.author.name for submission in submissionList for comment in submission.comments if comment is not None and comment.author is not None])
 
     # Generate a date list which contains the date and the post title
-    dates = ["=HYPERLINK(\"" + 'https://www.reddit.com/r/geoguessr/comments/' + submission.id + '", "' + getDate(submission) + ': ' + submission.title + "\")" for submission in submissionList]
-    cornerValue = 'Player\Challenge'
+    dates = [getTitle(submission.title) for submission in submissionList]
+    cornerValue = ''
+
+    dateSet = set()
+    for date in dates:
+        dateSet.add(date);
+
+    #print(dateSet)
 
     # Add the the value in the starting cell to the date list
     dates.insert(0, cornerValue)
@@ -141,16 +137,13 @@ def runScript():
     for index, scoreLine in enumerate(scores):
         scoreLine.insert(0, nameList[index])
 
-
     # Might be necessary if there is a post which has a lot of comments
     # submission.comments.replace_more(limit=0)
-
-    avoidPreviousWin = set("Previous win:", "for winning yesterday")
 
     # Get top level comments from submissions and get their first numbers with regular expressions
     for index, submission in enumerate(submissionList):
         for topLevelComment in submission.comments:
-            if topLevelComment.fullname not in commentRules and 'Previous win:' not in topLevelComment.body and 'for winning yesterday' not in topLevelComment.body and '|' not in topLevelComment.body and topLevelComment is not None and topLevelComment.author is not None:
+            if 'Previous win:' not in topLevelComment.body and 'for winning yesterday' not in topLevelComment.body and '|' not in topLevelComment.body and topLevelComment is not None and topLevelComment.author is not None:
                 try:
                     number = max([int(number.replace(',', '')) for number in re.findall('(?<!round )(?<!~~)(?<!\w)\d+\,?\d+', topLevelComment.body)])
                 except (IndexError, ValueError) as e:
@@ -160,9 +153,10 @@ def runScript():
                     scores[nameList.index(topLevelComment.author.name)][index + 1] = number
 
     # Read challenge overwrites
-    overwrites = service.spreadsheets().values().get(spreadsheetId=SHEET_ID, range=RANGE_OVERWRITE_SCORE).execute().get('values', [])
+    # overwrites = service.spreadsheets().values().get(spreadsheetId=SHEET_ID, range=RANGE_OVERWRITE_SCORE).execute().get('values', [])
 
     # Overwrite in scores
+    """
     for overwrite in overwrites:
         for index, submission in enumerate(submissionList):
             try:
@@ -170,6 +164,7 @@ def runScript():
                     scores[nameList.index(overwrite[0]) + 1][index + 1] = int(overwrite[1])
             except IndexError:
                 pass
+    """
 
     # Remove players who have very few games
     scores[:] = [scoreList for scoreList in scores if enoughGames(scoreList)]
@@ -215,12 +210,34 @@ def runScript():
         places[nameList.index(key)] = value
 
 
-    places = {'values': places[:]}
+    #places = {'values': places[:]}
     # print(places)
 
-    data = {'values': [scoreList[:] for scoreList in scores]}
-    # print(data)
+    #data = {'values': [scoreList[:] for scoreList in scores]}
 
+    #data_file = open('data.txt', 'w')
+
+    #for row in scores:
+    #    for val in row:
+    #        print(val, end=', ', file = data_file)
+    #    print('\n')
+
+    foile = open('data.txt', 'w')
+    print(scores, file = foile)
+
+    for date in dateSet:
+        file = open('series/' + date + '.txt', 'w+')
+        #for index in range(0, len(scores)):
+        #    print(scores[index][0], end = '', file = file)
+
+        for y in range(1, len(scores)):
+            for x in range(0, len(scores[y])):
+                if scores[0][x] == date or x == 0:
+                    print(scores[y][x], end = ', ', file = file)
+            print('\n', end = '', file = file)
+        file.close()
+    # print(data)
+    """
     # Write data to sheet
     service.spreadsheets().values().update(spreadsheetId=SHEET_ID, range=RANGE_ENTRY, body=data, valueInputOption='USER_ENTERED').execute()
 
@@ -232,7 +249,7 @@ def runScript():
 
     # Update "Challenges parsed" value
     service.spreadsheets().values().update(spreadsheetId=SHEET_ID, range=RANGE_CHALLENGES_PARSED, body={'values': [[len(submissionList)]]}, valueInputOption='USER_ENTERED').execute()    
-
+    """
     print('Successfully entered data.', file=f)
     f.close()
 
