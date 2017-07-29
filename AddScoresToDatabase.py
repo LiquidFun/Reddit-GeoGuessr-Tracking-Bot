@@ -14,14 +14,14 @@ def getDate(submission):
 def getTitle(submission):
     delimChars = ['-', ':', '=', '#', '(', ')']
 
-    title = submission.title
+    title = str(submission.title)
 
     # Get first part of title by spliting before line or colon
     for delimChar in delimChars:
         title = title.split(delimChar)[0]
 
     # Join the resulting chars
-    return ''.join(re.findall('[a-zA-Z]', title)).lower()
+    return str(''.join(re.findall('[a-zA-Z]', title)).lower())
 
 def addToDatabase(submissionList):
 
@@ -61,7 +61,7 @@ def addToDatabase(submissionList):
                             replyToTrackRequest(topLevelComment)
             except AttributeError:
                 pass
-            if 'Previous win:' not in topLevelComment.body and 'for winning yesterday' not in topLevelComment.body and '|' not in topLevelComment.body and topLevelComment is not None and topLevelComment.author is not None:
+            if 'Previous win:' not in topLevelComment.body and 'for winning' not in topLevelComment.body and 'for tying' not in topLevelComment.body and '|' not in topLevelComment.body and topLevelComment is not None and topLevelComment.author is not None:
                 try:
                     number = max([int(number.replace(',', '')) for number in re.findall('(?<!round )(?<!~~)(?<!\w)\d+\,?\d+', topLevelComment.body)])
                 except (IndexError, ValueError) as e:
@@ -88,7 +88,7 @@ def addToDatabase(submissionList):
             record = (getTitle(submission), str(submission.id), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
             cursor.execute("INSERT INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
         else:
-            cursor.execute("UPDATE ChallengeRankings SET Place1 = " + str(scoresInChallenge[0][1]) + ", SET Place2 = " + str(scoresInChallenge[1][1]) + ", SET Place3 = " + str(scoresInChallenge[2][1]) + " WHERE SubmissionID = '" + submission.id + "'")
+            cursor.execute("UPDATE ChallengeRankings SET Place1 = '" + str(scoresInChallenge[0][1]) + "', Place2 = '" + str(scoresInChallenge[1][1]) + "', Place3 = '" + str(scoresInChallenge[2][1]) + "' WHERE SubmissionID = '" + str(submission.id) + "'")
 
     # Write the !trackthisseries already replied to posts to the file
     inputFile = open("trackThisSeriesCommentIDs.txt", 'w+')
