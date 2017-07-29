@@ -11,8 +11,8 @@ def getRankingsFromDatabase(databaseName, seriesTitle):
     for row in cursor.execute('SELECT Place1, Place2, Place3 FROM ChallengeRankings WHERE SeriesTitle = \'' + seriesTitle + '\''):
         for val in row:
             if val is not '':
-                if '|' in val:
-                    print(val)
+                #if '|' in val:
+                    #print(val)
                 for author in val.split('|'):
                     nameSet.add(author)
                 #nameSet.add(author for author in val.split('|'))
@@ -25,11 +25,12 @@ def getRankingsFromDatabase(databaseName, seriesTitle):
         for row in cursor.execute('SELECT Place' + str(i) + ' FROM ChallengeRankings WHERE SeriesTitle = \'' + seriesTitle + '\''):
             for val in row:
                 if val is not '':
-                    table[nameList.index(val)][i] += 1
+                    for author in val.split('|'):
+                        table[nameList.index(author)][i] += 1
 
     table.sort(reverse = True, key = operator.itemgetter(1, 2, 3))
 
-    print(table)
+    #print(table)
     return table
 
 if __name__ == '__main__':

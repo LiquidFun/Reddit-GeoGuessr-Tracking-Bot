@@ -1,6 +1,7 @@
 import praw
 import re
 from datetime import datetime
+from AddScoresToDatabase import addToDatabase
 #import datetime
 import operator
 
@@ -47,8 +48,8 @@ def runScript():
 
     subreddit = reddit.subreddit("geoguessr")
 
-    #submissionList = [submission for submission in subreddit.submissions() if ('[1' in submission.title or '[2' in submission.title or '[3' in submission.title or '[4' in submission.title or '[5' in submission.title) ]
-    submissionList = subreddit.new(limit = 50)
+    submissionList = [submission for submission in subreddit.submissions() if ('[1' in submission.title or '[2' in submission.title or '[3' in submission.title or '[4' in submission.title or '[5' in submission.title) ]
+    #submissionList = subreddit.new(limit = 50)
 
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
@@ -56,14 +57,13 @@ def runScript():
     cursor.execute("DROP TABLE ChallengeRankings")
     cursor.execute("CREATE TABLE ChallengeRankings (SeriesTitle text, SubmissionID text, Place1 text, Place2 text, Place3 text, Date date)")
 
-    trackedSeriesNames = set()
+    # Commit the changes to the database
+    database.commit()
+    database.close()
 
-    #Add the titles from the last 
-    inputFile = open("Series.txt")
-    for line in inputFile:
-        trackedSeriesNames.add(line.replace('\n', ''))
-    inputFile.close()
+    addToDatabase(submissionList)
 
+    """
     # Get top level comments from submissions and get their first numbers with regular expressions
     for index, submission in enumerate(submissionList):
         scoresInChallenge = [[-1, ''], [-2, ''], [-3, '']] 
@@ -95,19 +95,12 @@ def runScript():
         #print(submission.created)
         record = (getTitle(submission.title), str(submission.id), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
         cursor.execute("INSERT INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
+    """
 
-    # Write SeriesTitles to file
-    inputFile = open("Series.txt", 'w+')
-    for series in trackedSeriesNames:
-        print(series, file = inputFile)
-    inputFile.close()
+    
 
-    for title in trackedSeriesNames:
-        print(title)
-
-    # Commit the changes to the database
-    database.commit()
-    database.close()
+    #for title in trackedSeriesNames:
+    #    print(title)
 
     # Print how long it took
     print(datetime.now() - startTime)
