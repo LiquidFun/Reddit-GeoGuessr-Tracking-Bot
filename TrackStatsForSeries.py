@@ -26,9 +26,10 @@ from time import gmtime, strftime, localtime
 #APPLICATION_NAME = 'GeoGuessr Statistics Tracker'
 
 def getDate(submission):
-    time = datetime.date.fromtimestamp(submission.created)
+    time = datetime.fromtimestamp(submission.created)
     # return datetime.date.fromtimestamp(time)
-    return time.strftime('%Y-%m-%d')
+    return time.strftime('%Y-%m-%d %H:%M:%S')
+    
 
 def getTitle(title):
     delimChars = ['-', ':', '=', '#', '(', ')']

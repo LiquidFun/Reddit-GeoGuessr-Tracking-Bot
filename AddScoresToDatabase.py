@@ -9,10 +9,12 @@ import sqlite3
 def getDate(submission):
     time = datetime.fromtimestamp(submission.created)
     # return datetime.date.fromtimestamp(time)
-    return time.strftime('%Y-%m-%d')
+    return time.strftime('%Y-%m-%d %H:%M:%S')
 
-def getTitle(title):
+def getTitle(submission):
     delimChars = ['-', ':', '=', '#', '(', ')']
+
+    title = submission.title
 
     # Get first part of title by spliting before line or colon
     for delimChar in delimChars:
@@ -32,9 +34,18 @@ def addToDatabase(submissionList):
     trackedSeriesNames = set()
 
     # Add the titles from the last session
-    inputFile = open("Series.txt")
-    for line in inputFile:
+    seriesFile = open("Series.txt")
+    for line in seriesFile:
         trackedSeriesNames.add(line.replace('\n', ''))
+    seriesFile.close()
+
+    trackedSeriesCommentIDs = set()
+
+    # Get the !trackthisseries posts already replied to
+    # Add the series IDs which the bot has already replied to
+    inputFile = open("trackThisSeriesCommentIDs.txt")
+    for line in inputFile:
+        trackedSeriesCommentIDs.add(line.replace('\n', ''))
     inputFile.close()
 
     # Get top level comments from submissions and get their first numbers with regular expressions
@@ -44,7 +55,10 @@ def addToDatabase(submissionList):
             try:
                 if topLevelComment.author.name == submission.author.name:
                     if '!trackthisseries' in topLevelComment.body.lower():
-                        trackedSeriesNames.add(getTitle(submission.title))
+                        print(submission.id)
+                        trackedSeriesNames.add(getTitle(submission))
+                        if topLevelComment.fullname not in trackedSeriesCommentIDs:
+                            replyToTrackRequest(topLevelComment)
             except AttributeError:
                 pass
             if 'Previous win:' not in topLevelComment.body and 'for winning yesterday' not in topLevelComment.body and '|' not in topLevelComment.body and topLevelComment is not None and topLevelComment.author is not None:
@@ -71,17 +85,26 @@ def addToDatabase(submissionList):
         #print(submission.created)
 
         if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = '" + submission.id + "'").fetchone()[0] == 0:
-            record = (getTitle(submission.title), str(submission.id), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
+            record = (getTitle(submission), str(submission.id), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
             cursor.execute("INSERT INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
         else:
             cursor.execute("UPDATE ChallengeRankings SET Place1 = " + str(scoresInChallenge[0][1]) + ", SET Place2 = " + str(scoresInChallenge[1][1]) + ", SET Place3 = " + str(scoresInChallenge[2][1]) + " WHERE SubmissionID = '" + submission.id + "'")
 
+    # Write the !trackthisseries already replied to posts to the file
+    inputFile = open("trackThisSeriesCommentIDs.txt", 'w+')
+    for commentID in trackedSeriesCommentIDs:
+        print(commentID, file = inputFile)
+    inputFile.close()
 
     # Write SeriesTitles to file
-    inputFile = open("Series.txt", 'w+')
+    seriesFile = open("Series.txt", 'w+')
     for series in trackedSeriesNames:
-        print(series, file = inputFile)
-    inputFile.close()
+        print(series, file = seriesFile)
+    seriesFile.close()
 
     database.commit()
     database.close()
+
+def replyToTrackRequest(comment):
+    print("I will be tracking this comment" + comment.fullname)
+    #comment.reply("I will be tracking this series from now on.")

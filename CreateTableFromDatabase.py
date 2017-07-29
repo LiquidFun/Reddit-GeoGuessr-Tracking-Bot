@@ -1,14 +1,16 @@
 import sqlite3
 import operator
+from AddScoresToDatabase import getTitle
+from AddScoresToDatabase import getDate
 
-def getRankingsFromDatabase(databaseName, seriesTitle):
+def getRankingsFromDatabase(databaseName, submission):
     
     #Connect to database
     database = sqlite3.connect(databaseName)
     cursor = database.cursor()
 
     nameSet = set()
-    for row in cursor.execute('SELECT Place1, Place2, Place3 FROM ChallengeRankings WHERE SeriesTitle = \'' + seriesTitle + '\''):
+    for row in cursor.execute('SELECT Place1, Place2, Place3 FROM ChallengeRankings WHERE SeriesTitle = \'' + getTitle(submission) + '\''):
         for val in row:
             if val is not '':
                 #if '|' in val:
@@ -22,7 +24,7 @@ def getRankingsFromDatabase(databaseName, seriesTitle):
     table = [[name, 0, 0, 0] for name in nameList]
 
     for i in range(1, 4):
-        for row in cursor.execute('SELECT Place' + str(i) + ' FROM ChallengeRankings WHERE SeriesTitle = \'' + seriesTitle + '\''):
+        for row in cursor.execute('SELECT Place' + str(i) + ' FROM ChallengeRankings WHERE SeriesTitle = \'' + getTitle(submission) + '\''):
             for val in row:
                 if val is not '':
                     for author in val.split('|'):
@@ -34,4 +36,4 @@ def getRankingsFromDatabase(databaseName, seriesTitle):
     return table
 
 if __name__ == '__main__':
-    getRankingsFromDatabase('database.db', 'dailychallenge')
+    print(getRankingsFromDatabase('database.db', 'dailychallenge'))

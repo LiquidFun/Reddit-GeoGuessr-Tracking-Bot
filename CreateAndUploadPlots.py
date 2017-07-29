@@ -3,24 +3,22 @@ import plotly.graph_objs as go
 #import plotly.offline as offline
 from CreateTableFromDatabase import getRankingsFromDatabase
 
-def createAndUplaodPlots(table, plotName):
+def createAndUploadPlots(table, plotName):
 
-    #offline.init_notebook_mode()
-
-    # Read reddit client_id and client_secret from file (to avoid accidentally publishing it)
+    # Read plotly username and API key from file (to avoid accidentally publishing it)
     inputFile = open("PlotlyAPIAccess.txt")
     lines = []
     for line in inputFile:
         lines.append(line)
     username = lines[0]
-    password = lines[1]
+    APIkey = lines[1]
 
+    # Sign in plotly
+    py.sign_in(username.replace('\n', ''), APIkey.replace('\n', ''))
 
-
-    py.sign_in(username.replace('\n', ''), password.replace('\n', ''))
-
-    print(table)
+    #print(table)
     
+    # Create the three place bars
     place1 = go.Bar(
         x=[row[0] for row in table],
         y=[row[1] for row in table],
@@ -50,11 +48,9 @@ def createAndUplaodPlots(table, plotName):
 
     fig = go.Figure(data=data, layout=layout)
     #py.image.save_as(fig, filename='plot.png')
-    url = py.plot(fig, filename = plotName + '.png')
-    print(url)
-    #offline.plot(fig, filename='grouped-bar', image = 'png')
+    return py.plot(fig, filename = plotName + '.png')
     #offline.plot(fig, image = 'png', filename = 'plot.html')
 
 
 if __name__ == '__main__':
-    createAndUplaodPlots(getRankingsFromDatabase("database.db", "statelands"), "statelands")
+    print(createAndUplaodPlots(getRankingsFromDatabase("database.db", "statelands"), "statelands"))
