@@ -33,6 +33,8 @@ def getRankingsFromDatabase(submission):
 
     table.sort(reverse = True, key = operator.itemgetter(1, 2, 3))
 
+    database.close()
+
     #print(table)
     return table
 

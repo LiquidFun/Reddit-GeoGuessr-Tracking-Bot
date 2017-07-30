@@ -112,14 +112,11 @@ def addToDatabase(submissionList):
 # Reply to the comment which asks the bot to track the series
 def replyToTrackRequest(comment, positive):
     if positive == True:
-        print("I will be tracking this comment" + comment.fullname)
+        print("I will be tracking this series: " + getTitle(comment.submission.title) + " because of this comment " + comment.fullname)
         #comment.reply("I will be tracking this series from now on.")
     else:
-        print("I will stop tracking this comment" + comment.fullname)
+        print("I will stop tracking this series: " + getTitle(comment.submission.title) + " because of this comment " + comment.fullname)
         #comment.reply("I will stop tracking this series from now on.")
-
-    database = sqlite3.connect('database.db')
-    cursor = database.cursor()
 
 def getBotUsername():
     inputFile = open("RedditAPIAccess.txt")

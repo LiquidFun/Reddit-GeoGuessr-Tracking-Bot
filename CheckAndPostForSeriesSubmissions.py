@@ -6,14 +6,14 @@ from CreateTableFromDatabase import getRankingsFromDatabase
 from AddScoresToDatabase import getTitle
 from AddScoresToDatabase import getDate
 from AddScoresToDatabase import addToDatabase
+from AddScoresToDatabase import getBotUsername
 from InitDatabase import getRedditInstance
 #import datetime
 import operator
 
 import sqlite3
 
-database = sqlite3.connect('database.db')
-cursor = database.cursor()
+
 
 # Checks about 100 new submissions, adds them to the local database, renews track requests
 def checkNewSubmissions():
@@ -21,16 +21,21 @@ def checkNewSubmissions():
     # Measure time
     startTime = datetime.now()
 
-    cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (SeriesTitle = 'redditgeoguessrcommunitychallenge', StartDate = '2017-07-10 01:00:00')")
+    #cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (SeriesTitle = 'redditgeoguessrcommunitychallenge', StartDate = '2017-07-10 01:00:00')")
+    #database = sqlite3.connect('database.db')
+    #cursor = database.cursor()
+    #for val in cursor.execute("SELECT * FROM SeriesTracking"):
+    #    print(val)
+    #database.close()
 
-    cursor.commit()
+    #cursor.commit()
 
     reddit = getRedditInstance()
     subreddit = reddit.subreddit("geoguessr")
 
-    submissionList = subreddit.new(limit = 10)
+    submissionList = subreddit.new(limit = 300)
 
-    addToDatabase(submissionList)
+    #addToDatabase(submissionList)
 
     checkForSeriesSubmissions(submissionList)
             
@@ -39,11 +44,25 @@ def checkNewSubmissions():
 
 # Check the submissionList for submissions for posts whose series is on the tracking list
 def checkForSeriesSubmissions(submissionList):
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
+
+    botUsername = getBotUsername()
 
     for submission in submissionList:
         if cursor.execute("SELECT COUNT(*) FROM SeriesTracking WHERE SeriesTitle = '" + str(getTitle(submission)) + "'").fetchone()[0] != 0:
-            if getSeriesDateFromDatabase(submission) < getSubmissionDateFromDatabase(submission):
+            alreadyPosted = False
+            for reply in submission.comments:
+                try:
+                    if reply.author.name == botUsername:
+                        alreadyPosted = True
+                except AttributeError:
+                    pass
+            if not alreadyPosted and getSeriesDateFromDatabase(submission) <= getSubmissionDateFromDatabase(submission):
+                print("Replying to submission: " + str(submission.id) + " in series: " + str(getTitle(submission)))
                 replyTrackedStats(submission)
+
+    database.close()
 
 # Reply to a post which has tracking enabled with the statistics of the series up until that post excluding itself
 def replyTrackedStats(submission):
@@ -87,13 +106,22 @@ def getPostFix(index):
 
 # Count the number of games in a series up until that post
 def getGameCountInSeriesSoFar(submission):
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
     return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = '" + getTitle(submission) + "' AND Date <= '" + getSubmissionDateFromDatabase(submission) + "'").fetchone()[0]
+    database.close()
 
 def getSeriesDateFromDatabase(submission):
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
     return cursor.execute("SELECT StartDate FROM SeriesTracking WHERE SeriesTitle = '" + str(getTitle(submission)) + "'").fetchone()[0]
+    database.close()
 
 def getSubmissionDateFromDatabase(submission):
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
     return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = '" + str(submission.id) + "'").fetchone()[0]
+    database.close()
 
 if __name__ == '__main__':
     checkNewSubmissions()

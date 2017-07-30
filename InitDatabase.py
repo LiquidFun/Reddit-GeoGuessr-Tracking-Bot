@@ -31,6 +31,7 @@ def runScript():
 
     # Measure time
     startTime = datetime.now()
+    print(str(datetime.now()) + ": Starting script.")
 
     print(str(datetime.now() - startTime) + ": Getting reddit instance. ")
 
@@ -53,6 +54,7 @@ def runScript():
 
     print(str(datetime.now() - startTime) + ": Creating the SQL table. ")
 
+    #Create tables in database
     cursor.execute("DROP TABLE ChallengeRankings")
     cursor.execute("CREATE TABLE ChallengeRankings (SubmissionID text, SeriesTitle text, Place1 text, Place2 text, Place3 text, Date timestamp)")
 
@@ -76,8 +78,6 @@ def runScript():
     print(str(datetime.now() - startTime) + ": Added " + cursor.execute("SELECT COUNT(*) FROM ChallengeRankings") + " challenges.")
     print(str(datetime.now() - startTime) + ": Added " + cursor.execute("SELECT COUNT(*) FROM SeriesTracking") + " series:")
     print(cursor.execute("SELECT * FROM SeriesTracking"))
-    #for title in trackedSeriesNames:
-    #    print(title)
 
     # Print how long it took
     print(datetime.now() - startTime)

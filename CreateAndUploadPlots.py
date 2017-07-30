@@ -49,7 +49,7 @@ def createAndUploadPlots(table, plotName):
 
     fig = go.Figure(data=data, layout=layout)
     #py.image.save_as(fig, filename='plot.png')
-    return py.plot(fig, filename = plotName + '.png')
+    return py.plot(fig, filename = plotName + '.png', auto_open=False)
     #offline.plot(fig, image = 'png', filename = 'plot.html')
 
 
