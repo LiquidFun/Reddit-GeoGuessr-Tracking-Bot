@@ -3,6 +3,7 @@ import plotly.graph_objs as go
 #import plotly.offline as offline
 from CreateTableFromDatabase import getRankingsFromDatabase
 
+# Using the plotly API creates a few plots
 def createAndUploadPlots(table, plotName):
 
     # Read plotly username and API key from file (to avoid accidentally publishing it)
@@ -53,4 +54,4 @@ def createAndUploadPlots(table, plotName):
 
 
 if __name__ == '__main__':
-    print(createAndUplaodPlots(getRankingsFromDatabase("database.db", "statelands"), "statelands"))
+    print(createAndUplaodPlots(getRankingsFromDatabase("statelands"), "statelands"))

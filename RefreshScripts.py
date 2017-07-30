@@ -4,6 +4,7 @@ import plotly.graph_objs as go
 from CreateTableFromDatabase import getRankingsFromDatabase
 from CheckForNewSubmissions import checkNewSubmissions
 
+# Refreshes all other scripts every couple of minutes
 def refreshScripts():
 
     checkNewSubmissions()

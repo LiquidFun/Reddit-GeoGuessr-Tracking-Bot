@@ -26,7 +26,7 @@ def checkForSeriesSubmissions():
 # Reply to a post which has tracking enabled with the statistics of the series up until that post excluding itself
 def replyTrackedStats(submission):
 
-    table = getRankingsFromDatabase("database.db", submission)
+    table = getRankingsFromDatabase(submission)
     text = ""
     place = 0
     for index, row in enumerate(table):
@@ -52,6 +52,7 @@ def replyTrackedStats(submission):
         text + "\n\n[Here](" + 
         url + ") is a visualization of the current stats.\n\n---\n\n^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://www.reddit.com/r/geoguessr/comments/6haay2/).")
 
+# Get the postfix st, nd, rd or th for a number
 def getPostFix(index):
     if index % 10 == 1 and index % 100 != 11:
         return 'st'
@@ -62,6 +63,7 @@ def getPostFix(index):
     else:
         return 'th'
 
+# Count the number of games in a series up until that post
 def getGameCountInSeriesSoFar(submission):
     database = sqlite3.connect("database.db")
     cursor = database.cursor()

@@ -4,26 +4,26 @@ from AddScoresToDatabase import getTitle
 from AddScoresToDatabase import getDate
 from InitDatabase import getRedditInstance
 
-def getRankingsFromDatabase(databaseName, submission):
+# Create a table with the rankings from the local database for a series up until a specific submission excluding that submission
+def getRankingsFromDatabase(submission):
     
-    #Connect to database
-    database = sqlite3.connect(databaseName)
+    # Connect to database
+    database = sqlite3.connect("database.db")
     cursor = database.cursor()
 
+    # Create a set with all the usernames in that series
     nameSet = set()
     for row in cursor.execute("SELECT Place1, Place2, Place3 FROM ChallengeRankings WHERE SeriesTitle = '" + getTitle(submission) + "' AND Date < '" + str(getDate(submission)) + "'"):
         for val in row:
             if val is not '':
-                #if '|' in val:
-                    #print(val)
                 for author in val.split('|'):
                     nameSet.add(author)
-                #nameSet.add(author for author in val.split('|'))
                 
     nameList = [name for name in nameSet]
 
     table = [[name, 0, 0, 0] for name in nameList]
 
+    # Iterate through every post in the series and increment the winners in the table
     for i in range(1, 4):
         for row in cursor.execute("SELECT Place" + str(i) + " FROM ChallengeRankings WHERE SeriesTitle = '" + getTitle(submission) + "' AND Date < '" + str(getDate(submission)) + "'"):
             for val in row:
@@ -38,4 +38,4 @@ def getRankingsFromDatabase(databaseName, submission):
 
 if __name__ == '__main__':
     reddit = getRedditInstance()
-    print(getRankingsFromDatabase('database.db', reddit.submission(id = '6haay2')))
+    print(getRankingsFromDatabase(reddit.submission(id = '6haay2')))

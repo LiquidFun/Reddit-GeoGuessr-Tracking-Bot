@@ -9,6 +9,7 @@ import operator
 
 import sqlite3
 
+# Checks about 100 new submissions, adds them to the local database, looks for !TrackThisSeries posts
 def checkNewSubmissions():
 
     # Measure time
@@ -19,11 +20,7 @@ def checkNewSubmissions():
 
     subreddit = reddit.subreddit("geoguessr")
 
-    #submissionList = [submission for submission in subreddit.submissions() if ('[1' in submission.title or '[2' in submission.title or '[3' in submission.title or '[4' in submission.title or '[5' in submission.title) ]
-    submissionList = subreddit.new(limit = 100)
-
-    #database = sqlite3.connect('database.db')
-    #cursor = database.cursor()
+    submissionList = subreddit.new(limit = 10)
 
     addToDatabase(submissionList)
 

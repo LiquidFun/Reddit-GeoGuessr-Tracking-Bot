@@ -42,6 +42,7 @@ def runScript():
 
     print(str(datetime.now() - startTime) + ": Creating submission list. ")
 
+    # Get submissions from the subreddit
     submissionList = [submission for submission in subreddit.submissions() if ('[1' in submission.title or '[2' in submission.title or '[3' in submission.title or '[4' in submission.title or '[5' in submission.title) ]
     #submissionList = subreddit.new(limit = 50)
 
@@ -54,6 +55,14 @@ def runScript():
 
     cursor.execute("DROP TABLE ChallengeRankings")
     cursor.execute("CREATE TABLE ChallengeRankings (SeriesTitle text, SubmissionID text, Place1 text, Place2 text, Place3 text, Date timestamp)")
+
+    cursor.execute("DROP TABLE SeriesTracking")
+    cursor.execute("CREATE TABLE SeriesTracking (SeriesTitle text, StartDate timestamp)")
+
+    cursor.execute("DROP TABLE TrackingRequests")
+    cursor.execute("CREATE TABLE TrackingRequests (CommentID text)"
+
+    #cursor.execute("CREATE TABLE SeriesStopTracking (SeriesTitle text)")
 
     # Commit the changes to the database
     database.commit()
