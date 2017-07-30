@@ -54,10 +54,11 @@ def runScript():
     print(str(datetime.now() - startTime) + ": Creating the SQL table. ")
 
     cursor.execute("DROP TABLE ChallengeRankings")
-    cursor.execute("CREATE TABLE ChallengeRankings (SeriesTitle text, SubmissionID text, Place1 text, Place2 text, Place3 text, Date timestamp)")
+    cursor.execute("CREATE TABLE ChallengeRankings (SubmissionID text, SeriesTitle text, Place1 text, Place2 text, Place3 text, Date timestamp)")
 
-    #cursor.execute("DROP TABLE SeriesTracking")
+    cursor.execute("DROP TABLE SeriesTracking")
     cursor.execute("CREATE TABLE SeriesTracking (SeriesTitle text, StartDate timestamp)")
+
 
     #cursor.execute("DROP TABLE TrackingRequests")
     #cursor.execute("CREATE TABLE TrackingRequests (CommentID text)")
@@ -72,6 +73,9 @@ def runScript():
 
     addToDatabase(submissionList)
 
+    print(str(datetime.now() - startTime) + ": Added " + cursor.execute("SELECT COUNT(*) FROM ChallengeRankings") + " challenges.")
+    print(str(datetime.now() - startTime) + ": Added " + cursor.execute("SELECT COUNT(*) FROM SeriesTracking") + " series:")
+    print(cursor.execute("SELECT * FROM SeriesTracking"))
     #for title in trackedSeriesNames:
     #    print(title)
 

@@ -32,7 +32,7 @@ def addToDatabase(submissionList):
 
     #reddit = getRedditInstance()
 
-    botUsername = getRedditUsername()
+    botUsername = getBotUsername()
 
     # Get top level comments from submissions and get their first numbers with regex
     for submission in reversed(list(submissionList)):
@@ -54,7 +54,7 @@ def addToDatabase(submissionList):
                                 #cursor.execute("INSERT OR REPLACE INTO TrackingRequests VALUES ('" + str(topLevelComment.fullname) + "')")
 
                         #if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
-                        if alreadyReplied:
+                        if not alreadyReplied:
                             replyToTrackRequest(topLevelComment, True)
                     if '!stoptracking' in topLevelComment.body.lower():
                         print("Found stop tracking request: " + str(submission.id))
@@ -67,7 +67,7 @@ def addToDatabase(submissionList):
                                 #cursor.execute("INSERT OR REPLACE INTO TrackingRequests VALUES ('" + str(topLevelComment.fullname) + "')")
 
                         #if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
-                        if alreadyReplied:
+                        if not alreadyReplied:
                             replyToTrackRequest(topLevelComment, False)
             except AttributeError:
                 pass
@@ -97,12 +97,14 @@ def addToDatabase(submissionList):
         #print(submission.created)
 
         # Write new entries to the local database
-        if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = '" + submission.id + "'").fetchone()[0] == 0:
-            record = (getTitle(submission), str(submission.id), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
-            cursor.execute("INSERT INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
+        record = (str(submission.id), getTitle(submission), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
+        cursor.execute("INSERT OR REPLACE INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
+
+        #if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = '" + submission.id + "'").fetchone()[0] == 0:
+        #    cursor.execute("INSERT INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
         # Update existing entries in the local database
-        else:
-            cursor.execute("UPDATE ChallengeRankings SET Place1 = '" + str(scoresInChallenge[0][1]) + "', Place2 = '" + str(scoresInChallenge[1][1]) + "', Place3 = '" + str(scoresInChallenge[2][1]) + "' WHERE SubmissionID = '" + str(submission.id) + "'")
+        #else:
+        #    cursor.execute("UPDATE ChallengeRankings SET Place1 = '" + str(scoresInChallenge[0][1]) + "', Place2 = '" + str(scoresInChallenge[1][1]) + "', Place3 = '" + str(scoresInChallenge[2][1]) + "' WHERE SubmissionID = '" + str(submission.id) + "'")
 
     database.commit()
     database.close()
@@ -119,7 +121,7 @@ def replyToTrackRequest(comment, positive):
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
 
-def getRedditUsername():
+def getBotUsername():
     inputFile = open("RedditAPIAccess.txt")
     lines = []
     for line in inputFile:

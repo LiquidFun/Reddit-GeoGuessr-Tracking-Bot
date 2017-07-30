@@ -21,7 +21,7 @@ def checkNewSubmissions():
     # Measure time
     startTime = datetime.now()
 
-    cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (SeriesTitle = 'redditgeoguessrcommunitychallenge', StartDate = '2017-07-10 00:00:00')")
+    cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (SeriesTitle = 'redditgeoguessrcommunitychallenge', StartDate = '2017-07-10 01:00:00')")
 
     cursor.commit()
 
