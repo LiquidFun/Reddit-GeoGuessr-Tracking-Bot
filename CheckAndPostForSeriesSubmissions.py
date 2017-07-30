@@ -11,16 +11,33 @@ import operator
 
 import sqlite3
 
-# Check the last ~100 submissions for posts which are on the tracking list
-def checkForSeriesSubmissions():
+database = sqlite3.connect('database.db')
+cursor = database.cursor()
+
+# Checks about 100 new submissions, adds them to the local database, renews track requests
+def checkNewSubmissions():
 
     # Measure time
     startTime = datetime.now()
 
-    # Get reddit instance
     reddit = getRedditInstance()
+    subreddit = reddit.subreddit("geoguessr")
 
-    submission = reddit.submission(id='6qaxro')
+    submissionList = subreddit.new(limit = 10)
+
+    addToDatabase(submissionList)
+
+    checkForSeriesSubmissions(submissionList)
+            
+    # Print how long it took
+    print(datetime.now() - startTime)
+
+# Check the submissionList for submissions for posts whose series is on the tracking list
+def checkForSeriesSubmissions(submissionList):
+
+    for submission in submissionList:
+
+    
     replyTrackedStats(submission)
 
 # Reply to a post which has tracking enabled with the statistics of the series up until that post excluding itself
@@ -65,12 +82,13 @@ def getPostFix(index):
 
 # Count the number of games in a series up until that post
 def getGameCountInSeriesSoFar(submission):
-    database = sqlite3.connect("database.db")
-    cursor = database.cursor()
+    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = '" + getTitle(submission) + "' AND Date <= '" + getSubmissionDateFromDatabase(submission) + "'").fetchone()[0]
 
-    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = '" + getTitle(submission) + "' AND Date <= '" + str(getDate(submission)) + "'").fetchone()[0]
+def getSeriesDateFromDatabase(submission):
+    return cursor.execute("SELECT StartDate FROM SeriesTracking WHERE SeriesTitle = '" + str(getTitle(submission)) + "'").fetchone()[0]
 
-    database.close()
+def getSubmissionDateFromDatabase(submission):
+    return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = '" + str(submission.id) + "'").fetchone()[0]
 
 if __name__ == '__main__':
-    checkForSeriesSubmissions()
+    checkNewSubmissions()

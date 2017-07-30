@@ -33,38 +33,16 @@ def addToDatabase(submissionList):
 
     reddit = getRedditInstance()
 
-    trackedSeriesNames = set()
-    # Add the titles from the last session
-    seriesFile = open("Series.txt")
-    for line in seriesFile:
-        trackedSeriesNames.add(line.replace('\n', ''))
-    seriesFile.close()
-
-    trackedSeriesCommentIDs = set()
-    # Get the !trackthisseries posts already replied to
-    # Add the series IDs which the bot has already replied to
-    inputFile = open("trackThisSeriesCommentIDs.txt")
-    for line in inputFile:
-        trackedSeriesCommentIDs.add(line.replace('\n', ''))
-    inputFile.close()
-    """
-    stopTrackingSeriesTitles = set()
-    # Series which shouldn't be tracked
-    stopFile = open("stopTrackingSeriesTitles.txt")
-    for line in stopFile:
-        trackedSeriesCommentIDs.add(line.replace('\n', ''))
-    stopFile.close()
-    """
     # Get top level comments from submissions and get their first numbers with regex
     for submission in reversed(list(submissionList)):
         scoresInChallenge = [[-1, ''], [-2, ''], [-3, ''], [-4, '']] 
         for topLevelComment in submission.comments:
 
-            # Looks for !TrackThisSeries posts and reply to them
+            # Looks for !TrackThisSeries and !StopTracking posts and replies to them
             try:
                 if topLevelComment.author.name == submission.author.name:
                     if '!trackthisseries' in topLevelComment.body.lower():
-                        print(submission.id)
+                        print("Found track request: " + str(submission.id))
                         # Write new entries to the local database
                         cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES ('" + getTitle(submission) + "', '" + getDate(submission) + "')")
                         
@@ -75,7 +53,7 @@ def addToDatabase(submissionList):
                         if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
                             replyToTrackRequest(topLevelComment, True)
                     if '!stoptracking' in topLevelComment.body.lower():
-                        print(submission.id)
+                        print("Found stop tracking request: " + str(submission.id))
                         # Delete old entries in the database
                         cursor.execute("DELETE FROM SeriesTracking WHERE SeriesTitle = '" + getTitle(submission) + "'")
                         
@@ -87,19 +65,8 @@ def addToDatabase(submissionList):
                             replyToTrackRequest(topLevelComment, False)
             except AttributeError:
                 pass
-            """
-            # Looks for !StopTracking posts and reply to them
-            try:
-                if topLevelComment.author.name == submission.author.name:
-                    if '!stoptracking' in topLevelComment.body.lower():
-                        print(submission.id)
-                        stopTrackingSeriesTitles.add(getTitle(submission))
-                        if topLevelComment.fullname not in trackedSeriesCommentIDs:
-                            replyToTrackRequest(topLevelComment)
-            except AttributeError:
-                pass
-            """
-            # Avoid comments which do not post their own score
+
+            # Avoid comments which do not post their own score; Get the highest number in each comment and add it to the list with the user's username
             if 'Previous win:' not in topLevelComment.body and 'for winning' not in topLevelComment.body and 'for tying' not in topLevelComment.body and '|' not in topLevelComment.body and topLevelComment is not None and topLevelComment.author is not None:
                 try:
                     number = max([int(number.replace(',', '')) for number in re.findall('(?<!round )(?<!~~)(?<!\w)\d+\,?\d+', topLevelComment.body)])
@@ -131,23 +98,6 @@ def addToDatabase(submissionList):
         else:
             cursor.execute("UPDATE ChallengeRankings SET Place1 = '" + str(scoresInChallenge[0][1]) + "', Place2 = '" + str(scoresInChallenge[1][1]) + "', Place3 = '" + str(scoresInChallenge[2][1]) + "' WHERE SubmissionID = '" + str(submission.id) + "'")
 
-    # Write the !trackthisseries already replied to posts to the file
-    inputFile = open("trackThisSeriesCommentIDs.txt", 'w+')
-    for commentID in trackedSeriesCommentIDs:
-        print(commentID, file = inputFile)
-    inputFile.close()
-
-    # Write SeriesTitles to file
-    seriesFile = open("Series.txt", 'w+')
-    for series in trackedSeriesNames:
-        print(series, file = seriesFile)
-    seriesFile.close()
-    """
-    stopFile = open("stopTrackingSeriesTitles.txt", 'w+')
-    for series in trackedSeriesNames:
-        print(series, file = seriesFile)
-    stopFile.close()
-    """
     database.commit()
     database.close()
 
@@ -159,4 +109,3 @@ def replyToTrackRequest(comment, positive):
     else:
         print("I will stop tracking this comment" + comment.fullname)
         #comment.reply("I will stop tracking this series from now on.")
-
