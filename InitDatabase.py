@@ -61,16 +61,6 @@ def runScript():
     cursor.execute("DROP TABLE SeriesTracking")
     cursor.execute("CREATE TABLE SeriesTracking (SeriesTitle text, StartDate timestamp)")
 
-
-    #cursor.execute("DROP TABLE TrackingRequests")
-    #cursor.execute("CREATE TABLE TrackingRequests (CommentID text)")
-
-    #cursor.execute("CREATE TABLE SeriesStopTracking (SeriesTitle text)")
-
-    # Commit the changes to the database
-    database.commit()
-    database.close()
-
     print(str(datetime.now() - startTime) + ": Adding data to database. ")
 
     addToDatabase(submissionList)
@@ -78,6 +68,10 @@ def runScript():
     print(str(datetime.now() - startTime) + ": Added " + cursor.execute("SELECT COUNT(*) FROM ChallengeRankings") + " challenges.")
     print(str(datetime.now() - startTime) + ": Added " + cursor.execute("SELECT COUNT(*) FROM SeriesTracking") + " series:")
     print(cursor.execute("SELECT * FROM SeriesTracking"))
+
+    # Commit the changes to the database
+    database.commit()
+    database.close()
 
     # Print how long it took
     print(datetime.now() - startTime)

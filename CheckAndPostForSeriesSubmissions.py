@@ -33,7 +33,7 @@ def checkNewSubmissions():
     reddit = getRedditInstance()
     subreddit = reddit.subreddit("geoguessr")
 
-    submissionList = subreddit.new(limit = 300)
+    submissionList = subreddit.new(limit = 10)
 
     addToDatabase(submissionList)
 
