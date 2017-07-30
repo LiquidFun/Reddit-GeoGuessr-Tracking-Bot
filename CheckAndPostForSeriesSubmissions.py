@@ -50,7 +50,7 @@ def checkForSeriesSubmissions(submissionList):
     botUsername = getBotUsername()
 
     for submission in submissionList:
-        if cursor.execute("SELECT COUNT(*) FROM SeriesTracking WHERE SeriesTitle = '" + str(getTitle(submission)) + "'").fetchone()[0] != 0:
+        if cursor.execute("SELECT COUNT(*) FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)]).fetchone()[0] != 0:
             alreadyPosted = False
             for reply in submission.comments:
                 try:
@@ -59,8 +59,11 @@ def checkForSeriesSubmissions(submissionList):
                 except AttributeError:
                     pass
             if not alreadyPosted and getSeriesDateFromDatabase(submission) <= getSubmissionDateFromDatabase(submission):
-                print("Replying to submission: " + str(submission.id) + " in series: " + str(getTitle(submission)))
+                print("Replying to submission: %s in series: %s" [str(submission.id), getTitle(submission)])
                 replyTrackedStats(submission)
+
+    reddit = getRedditInstance()
+    replyTrackedStats(reddit.submission(id = '6qhald'))
 
     database.close()
 
@@ -108,19 +111,19 @@ def getPostFix(index):
 def getGameCountInSeriesSoFar(submission):
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
-    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = '" + getTitle(submission) + "' AND Date <= '" + getSubmissionDateFromDatabase(submission) + "'").fetchone()[0]
+    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = ? AND Date <= ?", [getTitle(submission), getSubmissionDateFromDatabase(submission)]).fetchone()[0]
     database.close()
 
 def getSeriesDateFromDatabase(submission):
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
-    return cursor.execute("SELECT StartDate FROM SeriesTracking WHERE SeriesTitle = '" + str(getTitle(submission)) + "'").fetchone()[0]
+    return cursor.execute("SELECT StartDate FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)]).fetchone()[0]
     database.close()
 
 def getSubmissionDateFromDatabase(submission):
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
-    return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = '" + str(submission.id) + "'").fetchone()[0]
+    return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = ?", [str(submission.id)]).fetchone()[0]
     database.close()
 
 if __name__ == '__main__':

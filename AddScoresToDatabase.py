@@ -46,7 +46,7 @@ def addToDatabase(submissionList):
                     if '!trackthisseries' in topLevelComment.body.lower():
                         print("Found track request: " + str(submission.id))
                         # Write new entries to the local database
-                        cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES ('" + getTitle(submission) + "', '" + getDate(submission) + "')")
+                        cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (?, ?)", [getTitle(submission), getDate(submission)])
                         
                         for reply in topLevelComment.replies:
                             if reply.author.name == botUsername:
@@ -59,7 +59,7 @@ def addToDatabase(submissionList):
                     if '!stoptracking' in topLevelComment.body.lower():
                         print("Found stop tracking request: " + str(submission.id))
                         # Delete old entries in the database
-                        cursor.execute("DELETE FROM SeriesTracking WHERE SeriesTitle = '" + getTitle(submission) + "'")
+                        cursor.execute("DELETE FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)])
                         
                         for reply in topLevelComment.replies:
                             if reply.author.name == botUsername:
@@ -97,8 +97,9 @@ def addToDatabase(submissionList):
         #print(submission.created)
 
         # Write new entries to the local database
-        record = (str(submission.id), getTitle(submission), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
-        cursor.execute("INSERT OR REPLACE INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
+        if getTitle(submission) != '':
+            record = (str(submission.id), getTitle(submission), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
+            cursor.execute("INSERT OR REPLACE INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
 
         #if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = '" + submission.id + "'").fetchone()[0] == 0:
         #    cursor.execute("INSERT INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
