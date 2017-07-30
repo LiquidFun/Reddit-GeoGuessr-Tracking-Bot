@@ -13,7 +13,7 @@ def getDate(submission):
 def getTitle(submission):
     delimChars = ['-', ':', '=', '#', '(', ')']
 
-    title = str(submission.title)
+    title = re.sub(r'\([^)]*\)', '', submission.title)
 
     # Get first part of title by spliting before line or colon
     for delimChar in delimChars:
@@ -78,7 +78,7 @@ def addToDatabase(submissionList):
                     number = max([int(number.replace(',', '')) for number in re.findall('(?<!round )(?<!~~)(?<!\w)\d+\,?\d+', topLevelComment.body)])
                 except (IndexError, ValueError) as e:
                     number = -1
-                    break
+                    pass
                 if 0 <= number <= 32395:
                     scoresInChallenge.append([int(number), topLevelComment.author.name])
         scoresInChallenge.sort(key = operator.itemgetter(0), reverse = True)
@@ -97,9 +97,9 @@ def addToDatabase(submissionList):
         #print(submission.created)
 
         # Write new entries to the local database
-        if getTitle(submission) != '':
-            record = (str(submission.id), getTitle(submission), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
-            cursor.execute("INSERT OR REPLACE INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
+        #if getTitle(submission) != '':
+        record = (str(submission.id), getTitle(submission), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
+        cursor.execute("INSERT OR REPLACE INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
 
         #if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = '" + submission.id + "'").fetchone()[0] == 0:
         #    cursor.execute("INSERT INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
@@ -125,3 +125,6 @@ def getBotUsername():
     for line in inputFile:
         lines.append(line)
     return line[2]
+
+#if __name__ == '__main__':
+    #print(getTitle("[2] (late) Daily Challenge - July 22 (3 min timer)"))

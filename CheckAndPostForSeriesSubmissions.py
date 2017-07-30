@@ -59,7 +59,7 @@ def checkForSeriesSubmissions(submissionList):
                 except AttributeError:
                     pass
             if not alreadyPosted and getSeriesDateFromDatabase(submission) <= getSubmissionDateFromDatabase(submission):
-                print("Replying to submission: %s in series: %s" [str(submission.id), getTitle(submission)])
+                print("Replying to submission: " + str(submission.id) + " in series: " + str(getTitle(submission)))
                 replyTrackedStats(submission)
 
     reddit = getRedditInstance()
