@@ -35,7 +35,7 @@ def checkNewSubmissions():
 
     submissionList = subreddit.new(limit = 300)
 
-    #addToDatabase(submissionList)
+    addToDatabase(submissionList)
 
     checkForSeriesSubmissions(submissionList)
             
