@@ -19,11 +19,11 @@ def getRedditInstance():
     password = lines[3]
 
     # Get reddit instance
-    reddit = praw.Reddit(client_id=client_id.replace('\n', ''), 
-                         client_secret=client_secret.replace('\n', ''), 
+    reddit = praw.Reddit(client_id=client_id.rstrip(), 
+                         client_secret=client_secret.rstrip(), 
                          user_agent='linux:geoguessr_bot:0.1 (by /u/LiquidProgrammer',
-                         username=username.replace('\n', ''),
-                         password=password.replace('\n', ''))
+                         username=username.rstrip(),
+                         password=password.rstrip())
 
     return reddit
 
