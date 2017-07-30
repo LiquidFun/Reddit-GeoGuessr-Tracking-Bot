@@ -56,11 +56,11 @@ def runScript():
     cursor.execute("DROP TABLE ChallengeRankings")
     cursor.execute("CREATE TABLE ChallengeRankings (SeriesTitle text, SubmissionID text, Place1 text, Place2 text, Place3 text, Date timestamp)")
 
-    cursor.execute("DROP TABLE SeriesTracking")
+    #cursor.execute("DROP TABLE SeriesTracking")
     cursor.execute("CREATE TABLE SeriesTracking (SeriesTitle text, StartDate timestamp)")
 
-    cursor.execute("DROP TABLE TrackingRequests")
-    cursor.execute("CREATE TABLE TrackingRequests (CommentID text)"
+    #cursor.execute("DROP TABLE TrackingRequests")
+    #cursor.execute("CREATE TABLE TrackingRequests (CommentID text)")
 
     #cursor.execute("CREATE TABLE SeriesStopTracking (SeriesTitle text)")
 

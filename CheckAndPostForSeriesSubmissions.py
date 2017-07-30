@@ -5,6 +5,7 @@ from CreateAndUploadPlots import createAndUploadPlots
 from CreateTableFromDatabase import getRankingsFromDatabase
 from AddScoresToDatabase import getTitle
 from AddScoresToDatabase import getDate
+from AddScoresToDatabase import addToDatabase
 from InitDatabase import getRedditInstance
 #import datetime
 import operator
@@ -19,6 +20,10 @@ def checkNewSubmissions():
 
     # Measure time
     startTime = datetime.now()
+
+    cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (SeriesTitle = 'redditgeoguessrcommunitychallenge', StartDate = '2017-07-10 00:00:00')")
+
+    cursor.commit()
 
     reddit = getRedditInstance()
     subreddit = reddit.subreddit("geoguessr")
@@ -36,9 +41,9 @@ def checkNewSubmissions():
 def checkForSeriesSubmissions(submissionList):
 
     for submission in submissionList:
-
-    
-    replyTrackedStats(submission)
+        if cursor.execute("SELECT COUNT(*) FROM SeriesTracking WHERE SeriesTitle = '" + str(getTitle(submission)) + "'").fetchone()[0] != 0:
+            if getSeriesDateFromDatabase(submission) < getSubmissionDateFromDatabase(submission):
+                replyTrackedStats(submission)
 
 # Reply to a post which has tracking enabled with the statistics of the series up until that post excluding itself
 def replyTrackedStats(submission):

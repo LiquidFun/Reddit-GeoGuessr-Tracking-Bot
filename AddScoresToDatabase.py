@@ -1,7 +1,6 @@
 import praw
 import re
 from datetime import datetime
-#import datetime
 import operator
 
 import sqlite3
@@ -31,7 +30,9 @@ def addToDatabase(submissionList):
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
 
-    reddit = getRedditInstance()
+    #reddit = getRedditInstance()
+
+    botUsername = getRedditUsername()
 
     # Get top level comments from submissions and get their first numbers with regex
     for submission in reversed(list(submissionList)):
@@ -41,16 +42,19 @@ def addToDatabase(submissionList):
             # Looks for !TrackThisSeries and !StopTracking posts and replies to them
             try:
                 if topLevelComment.author.name == submission.author.name:
+                    alreadyReplied = False
                     if '!trackthisseries' in topLevelComment.body.lower():
                         print("Found track request: " + str(submission.id))
                         # Write new entries to the local database
                         cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES ('" + getTitle(submission) + "', '" + getDate(submission) + "')")
                         
                         for reply in topLevelComment.replies:
-                            if reply.author.name == reddit.user.me():
-                                cursor.execute("INSERT OR REPLACE INTO TrackingRequests VALUES ('" + str(topLevelComment.fullname) + "')")
+                            if reply.author.name == botUsername:
+                                alreadyReplied = True
+                                #cursor.execute("INSERT OR REPLACE INTO TrackingRequests VALUES ('" + str(topLevelComment.fullname) + "')")
 
-                        if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
+                        #if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
+                        if alreadyReplied:
                             replyToTrackRequest(topLevelComment, True)
                     if '!stoptracking' in topLevelComment.body.lower():
                         print("Found stop tracking request: " + str(submission.id))
@@ -58,10 +62,12 @@ def addToDatabase(submissionList):
                         cursor.execute("DELETE FROM SeriesTracking WHERE SeriesTitle = '" + getTitle(submission) + "'")
                         
                         for reply in topLevelComment.replies:
-                            if reply.author.name == reddit.user.me():
-                                cursor.execute("INSERT OR REPLACE INTO TrackingRequests VALUES ('" + str(topLevelComment.fullname) + "')")
+                            if reply.author.name == botUsername:
+                                alreadyReplied = True
+                                #cursor.execute("INSERT OR REPLACE INTO TrackingRequests VALUES ('" + str(topLevelComment.fullname) + "')")
 
-                        if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
+                        #if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
+                        if alreadyReplied:
                             replyToTrackRequest(topLevelComment, False)
             except AttributeError:
                 pass
@@ -109,3 +115,13 @@ def replyToTrackRequest(comment, positive):
     else:
         print("I will stop tracking this comment" + comment.fullname)
         #comment.reply("I will stop tracking this series from now on.")
+
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
+
+def getRedditUsername():
+    inputFile = open("RedditAPIAccess.txt")
+    lines = []
+    for line in inputFile:
+        lines.append(line)
+    return line[2]
