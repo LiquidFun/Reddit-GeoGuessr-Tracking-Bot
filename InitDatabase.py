@@ -55,18 +55,18 @@ def runScript():
     print(str(datetime.now() - startTime) + ": Creating the SQL table. ")
 
     #Create tables in database
-    cursor.execute("DROP TABLE ChallengeRankings")
+    cursor.execute("DROP TABLE IF EXISTS ChallengeRankings")
     cursor.execute("CREATE TABLE ChallengeRankings (SubmissionID text PRIMARY KEY, SeriesTitle text, Place1 text, Place2 text, Place3 text, Date timestamp)")
 
-    cursor.execute("DROP TABLE SeriesTracking")
+    cursor.execute("DROP TABLE IF EXISTS SeriesTracking")
     cursor.execute("CREATE TABLE SeriesTracking (SeriesTitle text, StartDate timestamp)")
 
     print(str(datetime.now() - startTime) + ": Adding data to database. ")
 
     addToDatabase(submissionList)
 
-    print(str(datetime.now() - startTime) + ": Added " + cursor.execute("SELECT COUNT(*) FROM ChallengeRankings") + " challenges.")
-    print(str(datetime.now() - startTime) + ": Added " + cursor.execute("SELECT COUNT(*) FROM SeriesTracking") + " series:")
+    print(str(datetime.now() - startTime) + ": Added " + str(cursor.execute("SELECT COUNT(*) FROM ChallengeRankings").fetchone()[0]) + " challenges.")
+    print(str(datetime.now() - startTime) + ": Added " + str(cursor.execute("SELECT COUNT(*) FROM SeriesTracking").fetchone()[0]) + " series:")
     print(cursor.execute("SELECT * FROM SeriesTracking"))
 
     # Commit the changes to the database

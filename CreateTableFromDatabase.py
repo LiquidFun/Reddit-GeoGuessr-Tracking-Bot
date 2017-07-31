@@ -25,7 +25,7 @@ def getRankingsFromDatabase(submission):
 
     # Iterate through every post in the series and increment the winners in the table
     for i in range(1, 4):
-        for row in cursor.execute("SELECT Place " + str(i) + " FROM ChallengeRankings WHERE SeriesTitle = ? AND Date < ?", [getTitle(submission), str(getDate(submission))]):
+        for row in cursor.execute("SELECT Place" + str(i) + " FROM ChallengeRankings WHERE SeriesTitle = ? AND Date < ?", [getTitle(submission), str(getDate(submission))]):
             for val in row:
                 if val is not '':
                     for author in val.split('|'):

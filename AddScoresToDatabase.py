@@ -13,7 +13,7 @@ def getDate(submission):
 def getTitle(submission):
     delimChars = ['-', ':', '=', '#', '(', ')']
 
-    title = re.sub(r'\([^)]*\)', '', submission.title)
+    title = re.sub(r'\([^)]*\)', '', str(submission.title))
 
     # Get first part of title by spliting before line or colon
     for delimChar in delimChars:
@@ -72,8 +72,14 @@ def addToDatabase(submissionList):
             except AttributeError:
                 pass
 
+            doesNotHave = ['previous win:', 'for winning', 'for tying', 'congrats to', '|', 'yesterday\'s winner']
+
+            body = ""
+            if topLevelComment is not None:
+                body = topLevelComment.body.lower()
+
             # Avoid comments which do not post their own score; Get the highest number in each comment and add it to the list with the user's username
-            if 'Previous win:' not in topLevelComment.body and 'for winning' not in topLevelComment.body and 'for tying' not in topLevelComment.body and '|' not in topLevelComment.body and topLevelComment is not None and topLevelComment.author is not None:
+            if all(string not in body for string in doesNotHave) and topLevelComment is not None and topLevelComment.author is not None:
                 try:
                     number = max([int(number.replace(',', '')) for number in re.findall('(?<!round )(?<!~~)(?<!\w)\d+\,?\d+', topLevelComment.body)])
                 except (IndexError, ValueError) as e:
@@ -113,10 +119,10 @@ def addToDatabase(submissionList):
 # Reply to the comment which asks the bot to track the series
 def replyToTrackRequest(comment, positive):
     if positive == True:
-        print("I will be tracking this series: " + getTitle(comment.submission.title) + " because of this comment " + comment.fullname)
+        print("I will be tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
         #comment.reply("I will be tracking this series from now on.")
     else:
-        print("I will stop tracking this series: " + getTitle(comment.submission.title) + " because of this comment " + comment.fullname)
+        print("I will stop tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
         #comment.reply("I will stop tracking this series from now on.")
 
 def getBotUsername():
