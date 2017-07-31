@@ -10,6 +10,7 @@ from AddScoresToDatabase import getBotUsername
 from AddScoresToDatabase import getSeriesDateFromDatabase
 from AddScoresToDatabase import getSubmissionDateFromDatabase
 from AddScoresToDatabase import getGameCountInSeriesSoFar
+from AddScoresToDatabase import getInfoLine
 from InitDatabase import getRedditInstance
 #import datetime
 import operator
@@ -58,7 +59,7 @@ def checkNewSubmissions():
 
     print(str(datetime.now() - startTime) + ": Acquiring submission list. ")
 
-    submissionList = subreddit.new(limit = 500)
+    submissionList = subreddit.new(limit = 10)
 
     print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
 
@@ -66,11 +67,13 @@ def checkNewSubmissions():
 
     print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
 
+    submissionList = subreddit.new(limit = 10)
+
     checkForSeriesSubmissions(submissionList)
             
     # Print how long it took
-    print(datetime.now() - startTime)
     print(str(datetime.now() - startTime) + ": Finished. ")    
+    print(datetime.now())
 
 # Check the submissionList for submissions for posts whose series is on the tracking list
 def checkForSeriesSubmissions(submissionList):
@@ -133,11 +136,7 @@ Ranking|User|1st|2nd|3rd
 :--|:--|:--|:--|:--
 %s 
 
-[Here](%s) is a visualization of the current rankings.
-
----
-
-^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://pastebin.com/aK8nuPL2).""" % (gameCount, text, url))
+[Here](%s) is a visualization of the current rankings. %s""" % (gameCount, text, url, getInfoLine()))
 
 # Get the postfix st, nd, rd or th for a number
 def getPostFix(index):

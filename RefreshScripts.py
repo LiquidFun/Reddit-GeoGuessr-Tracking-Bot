@@ -1,4 +1,5 @@
 #from CreateTableFromDatabase import getRankingsFromDatabase
+import time
 from CheckAndPostForSeriesSubmissions import checkNewSubmissions
 
 # Refreshes all other scripts every couple of minutes
@@ -8,7 +9,7 @@ def refreshScripts():
         checkNewSubmissions()
         timeToSleep = 600
         print("Sleeping for " + str(timeToSleep / 60) + " minutes.")
-        sleep(timeToSleep)
+        time.sleep(timeToSleep)
 
 
 

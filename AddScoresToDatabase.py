@@ -47,8 +47,10 @@ def addToDatabase(submissionList):
                     alreadyReplied = False
                     if '!trackthisseries' in topLevelComment.body.lower():
                         print("Found track request: " + str(submission.id))
+
                         # Write new entries to the local database
-                        cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (?, ?)", [getTitle(submission), getDate(submission)])
+                        if getTitle(submission) != '':
+                            cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (?, ?)", [getTitle(submission), getDate(submission)])
                         
                         for reply in topLevelComment.replies:
                             if reply.author.name == botUsername:
@@ -60,8 +62,10 @@ def addToDatabase(submissionList):
                             replyToTrackRequest(topLevelComment, True)
                     if '!stoptracking' in topLevelComment.body.lower():
                         print("Found stop tracking request: " + str(submission.id))
+
                         # Delete old entries in the database
-                        cursor.execute("DELETE FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)])
+                        if getTitle(submission) != '':
+                            cursor.execute("DELETE FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)])
                         
                         for reply in topLevelComment.replies:
                             if reply.author.name == botUsername:
@@ -122,10 +126,10 @@ def addToDatabase(submissionList):
 def replyToTrackRequest(comment, positive):
     if positive == True:
         print("I will be tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
-        comment.reply("I will be tracking this series from now on.")
+        comment.reply("""I will be tracking this series from now on. %s""" % [getInfoLine()])
     else:
         print("I will stop tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
-        comment.reply("I will stop tracking this series from now on.")
+        comment.reply("""I will stop tracking this series from now on. %s""" % [getInfoLine()])
 
 # Get the username of the bot which is currently logged in
 def getBotUsername():
@@ -157,6 +161,13 @@ def getSubmissionDateFromDatabase(submission):
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
     return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = ?", [str(submission.id)]).fetchone()[0]
+
+def getInfoLine():
+    return """
+
+---
+
+^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://pastebin.com/aK8nuPL2)."""
 
 #if __name__ == '__main__':
     #print(getTitle("[2] (late) Daily Challenge - July 22 (3 min timer)"))
