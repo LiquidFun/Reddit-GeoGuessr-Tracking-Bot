@@ -104,8 +104,8 @@ def addToDatabase(submissionList):
 
         # Write new entries to the local database
         #if getTitle(submission) != '':
-        record = (str(submission.id), getTitle(submission), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
-        cursor.execute("INSERT OR REPLACE INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)
+        record = (str(submission.id), getTitle(submission), str(submission.title), str(scoresInChallenge[0][1]), str(scoresInChallenge[1][1]), str(scoresInChallenge[2][1]), getDate(submission))
+        cursor.execute("INSERT OR REPLACE INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?, ?)", record)
 
         #if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = '" + submission.id + "'").fetchone()[0] == 0:
         #    cursor.execute("INSERT INTO ChallengeRankings VALUES (?, ?, ?, ?, ?, ?)", record)

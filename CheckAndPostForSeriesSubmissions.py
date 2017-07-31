@@ -92,9 +92,16 @@ def replyTrackedStats(submission):
     gameCount = getGameCountInSeriesSoFar(submission)
 
     #submission.reply
-    print("I have found " + str(gameCount) + " challenges in this series so far:\n\nRanking|User|1st|2nd|3rd\n:--|:--|:--|:--|:--\n" + 
-        text + "\n\n[Here](" + 
-        url + ") is a visualization of the current stats.\n\n---\n\n^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://www.reddit.com/r/geoguessr/comments/6haay2/).")
+    print("""I have found %s challenges in this series so far:
+
+        Ranking|User|1st|2nd|3rd\n:--|:--|:--|:--|:--
+        %s 
+
+        [Here](%s) is a visualization of the current stats.
+
+        ---
+
+        ^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://www.reddit.com/r/geoguessr/comments/6haay2/).""" % (gameCount, text, url))
 
 # Get the postfix st, nd, rd or th for a number
 def getPostFix(index):

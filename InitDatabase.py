@@ -56,7 +56,7 @@ def runScript():
 
     #Create tables in database
     cursor.execute("DROP TABLE IF EXISTS ChallengeRankings")
-    cursor.execute("CREATE TABLE ChallengeRankings (SubmissionID text PRIMARY KEY, SeriesTitle text, Place1 text, Place2 text, Place3 text, Date timestamp)")
+    cursor.execute("CREATE TABLE ChallengeRankings (SubmissionID text PRIMARY KEY, SeriesTitle text, SubmissionTitle text, Place1 text, Place2 text, Place3 text, Date timestamp)")
 
     cursor.execute("DROP TABLE IF EXISTS SeriesTracking")
     cursor.execute("CREATE TABLE SeriesTracking (SeriesTitle text, StartDate timestamp)")
