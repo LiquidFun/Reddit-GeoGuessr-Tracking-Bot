@@ -62,7 +62,7 @@ def runScript():
     cursor.execute("CREATE TABLE ChallengeRankings (SubmissionID text PRIMARY KEY, SeriesTitle text, SubmissionTitle text, Place1 text, Place2 text, Place3 text, Date timestamp)")
 
     cursor.execute("DROP TABLE IF EXISTS SeriesTracking")
-    cursor.execute("CREATE TABLE SeriesTracking (SeriesTitle text, StartDate timestamp)")
+    cursor.execute("CREATE TABLE SeriesTracking (SeriesTitle text PRIMARY KEY, StartDate timestamp)")
 
     print(str(datetime.now() - startTime) + ": Adding data to database. ")
 

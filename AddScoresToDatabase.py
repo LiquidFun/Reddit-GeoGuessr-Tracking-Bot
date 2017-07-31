@@ -136,10 +136,13 @@ def getBotUsername():
     return lines[2].strip()
 
 # Count the number of games in a series up until that post
-def getGameCountInSeriesSoFar(submission):
+def getGameCountInSeriesSoFar(submission, includeSubmission):
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
-    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = ? AND Date <= ?", [getTitle(submission), getSubmissionDateFromDatabase(submission)]).fetchone()[0]
+    sign = '<'
+    if includeSubmission:
+        sign = '<='
+    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = ? AND Date " + sign + " ?", [getTitle(submission), getSubmissionDateFromDatabase(submission)]).fetchone()[0]
     database.close()
 
 # Get the date when the series was added to the database

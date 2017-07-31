@@ -42,6 +42,8 @@ def checkNewSubmissions():
     # Measure time
     startTime = datetime.now()
 
+    print(str(datetime.now()) + ": Running script.")
+
     #cursor.execute("INSERT OR REPLACE INTO SeriesTracking VALUES (SeriesTitle = 'redditgeoguessrcommunitychallenge', StartDate = '2017-07-10 01:00:00')")
     #database = sqlite3.connect('database.db')
     #cursor = database.cursor()
@@ -54,14 +56,21 @@ def checkNewSubmissions():
     reddit = getRedditInstance()
     subreddit = reddit.subreddit("geoguessr")
 
+    print(str(datetime.now() - startTime) + ": Acquiring submission list. ")
+
     submissionList = subreddit.new(limit = 500)
 
-    #addToDatabase(submissionList)
+    print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
+
+    addToDatabase(submissionList)
+
+    print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
 
     checkForSeriesSubmissions(submissionList)
             
     # Print how long it took
     print(datetime.now() - startTime)
+    print(str(datetime.now() - startTime) + ": Finished. ")    
 
 # Check the submissionList for submissions for posts whose series is on the tracking list
 def checkForSeriesSubmissions(submissionList):
@@ -70,23 +79,24 @@ def checkForSeriesSubmissions(submissionList):
 
     botUsername = getBotUsername()
 
-    print(botUsername)
+    #print(botUsername)
 
     # For each submission check if it's title is in the series tracking list. Then check if the bot has already replied to that post
     for submission in submissionList:
         if cursor.execute("SELECT COUNT(*) FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)]).fetchone()[0] != 0:
-            if getGameCountInSeriesSoFar(submission) > 1:
+            if getGameCountInSeriesSoFar(submission, True) > 1:
                 alreadyPosted = False
                 for reply in submission.comments:
                     try:
-                        print(reply.author.name)
+                        #print(reply.author.name)
                         if reply.author.name == botUsername:
                             alreadyPosted = True
                     except AttributeError:
                         pass
                 if not alreadyPosted and getSeriesDateFromDatabase(submission) <= getSubmissionDateFromDatabase(submission):
                     print("Replying to submission: " + str(submission.id) + " in series: " + str(getTitle(submission)))
-                    #replyTrackedStats(submission)
+                    replyTrackedStats(submission)
+                    break
 
     #reddit = getRedditInstance()
     #replyTrackedStats(reddit.submission(id = '6qhald'))
@@ -115,7 +125,7 @@ def replyTrackedStats(submission):
 
     url = createAndUploadPlots(table, "%s %s" % (getFancyTitle(submission), getNumberFromTitle(submission)))
 
-    gameCount = getGameCountInSeriesSoFar(submission)
+    gameCount = getGameCountInSeriesSoFar(submission, False)
 
     submission.reply("""I have found %s challenges in this series so far:
 
