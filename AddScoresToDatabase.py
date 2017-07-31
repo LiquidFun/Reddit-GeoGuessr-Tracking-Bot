@@ -11,7 +11,7 @@ def getDate(submission):
     return time.strftime('%Y-%m-%d %H:%M:%S')
 
 def getTitle(submission):
-    delimChars = ['-', ':', '=', '#', '(', ')']
+    delimChars = ['-', ':', '=', '#']
 
     # Remove parenthesis and square brackets and stuff within them from title
     title = re.sub(r'\([^)]*\)', '', str(submission.title))
@@ -127,12 +127,33 @@ def replyToTrackRequest(comment, positive):
         print("I will stop tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
         comment.reply("I will stop tracking this series from now on.")
 
+# Get the username of the bot which is currently logged in
 def getBotUsername():
     inputFile = open("RedditAPIAccess.txt")
     lines = []
     for line in inputFile:
         lines.append(line)
-    return line[2]
+    return lines[2].strip()
+
+# Count the number of games in a series up until that post
+def getGameCountInSeriesSoFar(submission):
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
+    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = ? AND Date <= ?", [getTitle(submission), getSubmissionDateFromDatabase(submission)]).fetchone()[0]
+    database.close()
+
+# Get the date when the series was added to the database
+def getSeriesDateFromDatabase(submission):
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
+    return cursor.execute("SELECT StartDate FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)]).fetchone()[0]
+    database.close()
+
+# Get the date in the database for the submission (getDate(submission) and the date in the submission are different for whatever reason so this comparison is more acurate)
+def getSubmissionDateFromDatabase(submission):
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
+    return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = ?", [str(submission.id)]).fetchone()[0]
 
 #if __name__ == '__main__':
     #print(getTitle("[2] (late) Daily Challenge - July 22 (3 min timer)"))

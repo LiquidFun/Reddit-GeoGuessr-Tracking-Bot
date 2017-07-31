@@ -7,6 +7,9 @@ from AddScoresToDatabase import getTitle
 from AddScoresToDatabase import getDate
 from AddScoresToDatabase import addToDatabase
 from AddScoresToDatabase import getBotUsername
+from AddScoresToDatabase import getSeriesDateFromDatabase
+from AddScoresToDatabase import getSubmissionDateFromDatabase
+from AddScoresToDatabase import getGameCountInSeriesSoFar
 from InitDatabase import getRedditInstance
 #import datetime
 import operator
@@ -28,7 +31,7 @@ def getFancyTitle(submission):
 def getNumberFromTitle(submission):
     title = str(submission.title)
 
-    num = re.search("#\d*", title)
+    num = re.search("#\d*", title + "#0")
 
     return num.group(0)
 
@@ -67,18 +70,23 @@ def checkForSeriesSubmissions(submissionList):
 
     botUsername = getBotUsername()
 
+    print(botUsername)
+
+    # For each submission check if it's title is in the series tracking list. Then check if the bot has already replied to that post
     for submission in submissionList:
         if cursor.execute("SELECT COUNT(*) FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)]).fetchone()[0] != 0:
-            alreadyPosted = False
-            for reply in submission.comments:
-                try:
-                    if reply.author.name == botUsername:
-                        alreadyPosted = True
-                except AttributeError:
-                    pass
-            if not alreadyPosted and getSeriesDateFromDatabase(submission) <= getSubmissionDateFromDatabase(submission):
-                print("Replying to submission: " + str(submission.id) + " in series: " + str(getTitle(submission)))
-                replyTrackedStats(submission)
+            if getGameCountInSeriesSoFar(submission) > 1:
+                alreadyPosted = False
+                for reply in submission.comments:
+                    try:
+                        print(reply.author.name)
+                        if reply.author.name == botUsername:
+                            alreadyPosted = True
+                    except AttributeError:
+                        pass
+                if not alreadyPosted and getSeriesDateFromDatabase(submission) <= getSubmissionDateFromDatabase(submission):
+                    print("Replying to submission: " + str(submission.id) + " in series: " + str(getTitle(submission)))
+                    #replyTrackedStats(submission)
 
     #reddit = getRedditInstance()
     #replyTrackedStats(reddit.submission(id = '6qhald'))
@@ -109,8 +117,7 @@ def replyTrackedStats(submission):
 
     gameCount = getGameCountInSeriesSoFar(submission)
 
-    #submission.reply
-    print("""I have found %s challenges in this series so far:
+    submission.reply("""I have found %s challenges in this series so far:
 
 Ranking|User|1st|2nd|3rd
 :--|:--|:--|:--|:--
@@ -120,7 +127,7 @@ Ranking|User|1st|2nd|3rd
 
 ---
 
-^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://www.reddit.com/r/geoguessr/comments/6haay2/).""" % (gameCount, text, url))
+^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://pastebin.com/aK8nuPL2).""" % (gameCount, text, url))
 
 # Get the postfix st, nd, rd or th for a number
 def getPostFix(index):
@@ -133,23 +140,6 @@ def getPostFix(index):
     else:
         return 'th'
 
-# Count the number of games in a series up until that post
-def getGameCountInSeriesSoFar(submission):
-    database = sqlite3.connect('database.db')
-    cursor = database.cursor()
-    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SeriesTitle = ? AND Date <= ?", [getTitle(submission), getSubmissionDateFromDatabase(submission)]).fetchone()[0]
-    database.close()
-
-def getSeriesDateFromDatabase(submission):
-    database = sqlite3.connect('database.db')
-    cursor = database.cursor()
-    return cursor.execute("SELECT StartDate FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)]).fetchone()[0]
-    database.close()
-
-def getSubmissionDateFromDatabase(submission):
-    database = sqlite3.connect('database.db')
-    cursor = database.cursor()
-    return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = ?", [str(submission.id)]).fetchone()[0]
     database.close()
 
 if __name__ == '__main__':

@@ -31,10 +31,12 @@ def runScript():
 
     # Measure time
     startTime = datetime.now()
+
     print(str(datetime.now()) + ": Starting script.")
 
     print(str(datetime.now() - startTime) + ": Getting reddit instance. ")
 
+    # Get reddit instance as GeoGuessrTrackingBot
     reddit = getRedditInstance()
 
     print(str(datetime.now() - startTime) + ": Logged in as " + str(reddit.user.me()) + ". ")
@@ -43,18 +45,19 @@ def runScript():
 
     print(str(datetime.now() - startTime) + ": Creating submission list. ")
 
-    # Get submissions from the subreddit
+    # Get all the submissions from the subreddit
     submissionList = [submission for submission in subreddit.submissions() if ('[1' in submission.title or '[2' in submission.title or '[3' in submission.title or '[4' in submission.title or '[5' in submission.title) ]
     #submissionList = subreddit.new(limit = 50)
 
     print(str(datetime.now() - startTime) + ": Opening SQL Database. ")
 
+    # Open the database
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
 
     print(str(datetime.now() - startTime) + ": Creating the SQL table. ")
 
-    #Create tables in database
+    # Create tables in database
     cursor.execute("DROP TABLE IF EXISTS ChallengeRankings")
     cursor.execute("CREATE TABLE ChallengeRankings (SubmissionID text PRIMARY KEY, SeriesTitle text, SubmissionTitle text, Place1 text, Place2 text, Place3 text, Date timestamp)")
 
@@ -63,6 +66,7 @@ def runScript():
 
     print(str(datetime.now() - startTime) + ": Adding data to database. ")
 
+    # Add the statistics to the database
     addToDatabase(submissionList)
 
     print(str(datetime.now() - startTime) + ": Added " + str(cursor.execute("SELECT COUNT(*) FROM ChallengeRankings").fetchone()[0]) + " challenges.")

@@ -3,7 +3,7 @@ import operator
 from AddScoresToDatabase import getTitle
 from AddScoresToDatabase import getDate
 from InitDatabase import getRedditInstance
-from CheckAndPostForSeriesSubmissions import getSubmissionDateFromDatabase
+from AddScoresToDatabase import getSubmissionDateFromDatabase
 
 # Create a table with the rankings from the local database for a series up until a specific submission excluding that submission
 def getRankingsFromDatabase(submission):
