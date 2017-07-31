@@ -13,7 +13,9 @@ def getDate(submission):
 def getTitle(submission):
     delimChars = ['-', ':', '=', '#', '(', ')']
 
+    # Remove parenthesis and square brackets and stuff within them from title
     title = re.sub(r'\([^)]*\)', '', str(submission.title))
+    title = re.sub(r'\[[^]]*\]', '', title)
 
     # Get first part of title by spliting before line or colon
     for delimChar in delimChars:
@@ -72,7 +74,7 @@ def addToDatabase(submissionList):
             except AttributeError:
                 pass
 
-            doesNotHave = ['previous win:', 'for winning', 'for tying', 'congrats to', '|', 'yesterday\'s winner']
+            doesNotHave = ['previous win:', 'for winning', 'for tying', 'congrats to', '|', 'yesterday\'s winner', "leaderboard:"]
 
             body = ""
             if topLevelComment is not None:
@@ -120,10 +122,10 @@ def addToDatabase(submissionList):
 def replyToTrackRequest(comment, positive):
     if positive == True:
         print("I will be tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
-        #comment.reply("I will be tracking this series from now on.")
+        comment.reply("I will be tracking this series from now on.")
     else:
         print("I will stop tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
-        #comment.reply("I will stop tracking this series from now on.")
+        comment.reply("I will stop tracking this series from now on.")
 
 def getBotUsername():
     inputFile = open("RedditAPIAccess.txt")

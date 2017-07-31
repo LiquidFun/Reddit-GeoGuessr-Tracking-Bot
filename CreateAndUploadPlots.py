@@ -23,26 +23,27 @@ def createAndUploadPlots(table, plotName):
     place1 = go.Bar(
         x=[row[0] for row in table],
         y=[row[1] for row in table],
-        name='First Place',
+        name='First Place Count',
         marker=dict(color='rgb(252,223,7)')
     )
     place2 = go.Bar(
         x=[row[0] for row in table],
         y=[row[2] for row in table],
-        name='Second Place',
+        name='Second Place Count',
         marker=dict(color='rgb(204,204,204)')
     )
 
     place3 = go.Bar(
         x=[row[0] for row in table],
         y=[row[3] for row in table],
-        name='Third Place',
+        name='Third Place Count',
         marker=dict(color='rgb(142,75,17)')
     )
 
 
     data = [place1, place2, place3]
     layout = go.Layout(
+        title='%s' % (plotName),
         barmode='group'
     )
 

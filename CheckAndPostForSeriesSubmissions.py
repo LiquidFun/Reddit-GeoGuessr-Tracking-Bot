@@ -13,6 +13,24 @@ import operator
 
 import sqlite3
 
+def getFancyTitle(submission):
+    delimChars = ['-', ':', '=', '#', '(', ')']
+
+    title = re.sub(r'\([^)]*\)', '', str(submission.title))
+
+    # Get first part of title by spliting before line or colon
+    for delimChar in delimChars:
+        title = title.split(delimChar)[0]
+
+    # Join the resulting chars
+    return title
+
+def getNumberFromTitle(submission):
+    title = str(submission.title)
+
+    num = re.search("#\d*", title)
+
+    return num.group(0)
 
 
 # Checks about 100 new submissions, adds them to the local database, renews track requests
@@ -33,9 +51,9 @@ def checkNewSubmissions():
     reddit = getRedditInstance()
     subreddit = reddit.subreddit("geoguessr")
 
-    submissionList = subreddit.new(limit = 10)
+    submissionList = subreddit.new(limit = 500)
 
-    addToDatabase(submissionList)
+    #addToDatabase(submissionList)
 
     checkForSeriesSubmissions(submissionList)
             
@@ -62,8 +80,8 @@ def checkForSeriesSubmissions(submissionList):
                 print("Replying to submission: " + str(submission.id) + " in series: " + str(getTitle(submission)))
                 replyTrackedStats(submission)
 
-    reddit = getRedditInstance()
-    replyTrackedStats(reddit.submission(id = '6qhald'))
+    #reddit = getRedditInstance()
+    #replyTrackedStats(reddit.submission(id = '6qhald'))
 
     database.close()
 
@@ -87,21 +105,22 @@ def replyTrackedStats(submission):
                 text += '|' + str(val)
         text += '\n'
 
-    url = createAndUploadPlots(table, submission.id)
+    url = createAndUploadPlots(table, "%s %s" % (getFancyTitle(submission), getNumberFromTitle(submission)))
 
     gameCount = getGameCountInSeriesSoFar(submission)
 
     #submission.reply
     print("""I have found %s challenges in this series so far:
 
-        Ranking|User|1st|2nd|3rd\n:--|:--|:--|:--|:--
-        %s 
+Ranking|User|1st|2nd|3rd
+:--|:--|:--|:--|:--
+%s 
 
-        [Here](%s) is a visualization of the current stats.
+[Here](%s) is a visualization of the current rankings.
 
-        ---
+---
 
-        ^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://www.reddit.com/r/geoguessr/comments/6haay2/).""" % (gameCount, text, url))
+^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://www.reddit.com/r/geoguessr/comments/6haay2/).""" % (gameCount, text, url))
 
 # Get the postfix st, nd, rd or th for a number
 def getPostFix(index):
