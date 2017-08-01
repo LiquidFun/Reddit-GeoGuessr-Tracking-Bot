@@ -41,4 +41,4 @@ def getRankingsFromDatabase(submission):
 
 if __name__ == '__main__':
     reddit = getRedditInstance()
-    print(getRankingsFromDatabase(reddit.submission(id = '6haay2')))
+    print(getRankingsFromDatabase(reddit.submission(id = '6qoini')))

@@ -11,10 +11,13 @@ def getDate(submission):
     return time.strftime('%Y-%m-%d %H:%M:%S')
 
 def getTitle(submission):
+    return convertTitle(submission.title)
+
+def convertTitle(Title):
     delimChars = ['-', ':', '=', '#']
 
     # Remove parenthesis and square brackets and stuff within them from title
-    title = re.sub(r'\([^)]*\)', '', str(submission.title))
+    title = re.sub(r'\([^)]*\)', '', str(Title))
     title = re.sub(r'\[[^]]*\]', '', title)
 
     # Get first part of title by spliting before line or colon

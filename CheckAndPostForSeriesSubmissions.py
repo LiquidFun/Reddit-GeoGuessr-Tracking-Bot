@@ -70,7 +70,7 @@ def checkNewSubmissions():
 
     print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
 
-    submissionList = subreddit.new(limit = 300)
+    submissionList = subreddit.new(limit = 100)
 
     checkForSeriesSubmissions(submissionList)
 
@@ -108,7 +108,9 @@ def checkForSeriesSubmissions(submissionList):
                 if not alreadyPosted and getSeriesDateFromDatabase(submission) <= getSubmissionDateFromDatabase(submission):
                     print("Replying to submission: " + str(submission.id) + " in series: " + str(getTitle(submission)))
                     replyTrackedStats(submission)
-                    break
+
+                    # Was necessary to break because when the bot was a new account it could only post every 10 minutes
+                    # break
 
     #reddit = getRedditInstance()
     #replyTrackedStats(reddit.submission(id = '6qhald'))
@@ -139,7 +141,8 @@ def replyTrackedStats(submission):
 
     gameCount = getGameCountInSeriesSoFar(submission, False)
 
-    submission.reply("""I have found %s challenges in this series so far:
+    #submission.reply
+    print("""I have found %s challenges in this series so far:
 
 Ranking|User|1st|2nd|3rd
 :--|:--|:--|:--|:--
@@ -162,3 +165,5 @@ def getPostFix(index):
 
 if __name__ == '__main__':
     checkNewSubmissions()
+    #reddit = getRedditInstance()
+    #replyTrackedStats(reddit.submission(id = '6qoini'))
