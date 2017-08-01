@@ -24,6 +24,7 @@ def getTitle(submission):
     # Join the resulting chars
     return str(''.join(re.findall('[a-zA-Z]', title)).lower())
 
+# Iterate over the submission list, add submissions to the local database, extract comments, order them by ranking gotten, look for tracking requests and reply to them
 def addToDatabase(submissionList):
 
     # Measure time
@@ -55,9 +56,7 @@ def addToDatabase(submissionList):
                         for reply in topLevelComment.replies:
                             if reply.author.name == botUsername:
                                 alreadyReplied = True
-                                #cursor.execute("INSERT OR REPLACE INTO TrackingRequests VALUES ('" + str(topLevelComment.fullname) + "')")
 
-                        #if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
                         if not alreadyReplied:
                             replyToTrackRequest(topLevelComment, True)
                     if '!stoptracking' in topLevelComment.body.lower():
@@ -70,9 +69,7 @@ def addToDatabase(submissionList):
                         for reply in topLevelComment.replies:
                             if reply.author.name == botUsername:
                                 alreadyReplied = True
-                                #cursor.execute("INSERT OR REPLACE INTO TrackingRequests VALUES ('" + str(topLevelComment.fullname) + "')")
 
-                        #if cursor.execute("SELECT COUNT(*) FROM TrackingRequests WHERE CommentID = '" + str(topLevelComment.fullname) + "'").fetchone()[0] == 0:
                         if not alreadyReplied:
                             replyToTrackRequest(topLevelComment, False)
             except AttributeError:
