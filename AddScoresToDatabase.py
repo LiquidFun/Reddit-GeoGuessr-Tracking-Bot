@@ -186,7 +186,7 @@ def getInfoLine():
 
 ---
 
-^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://pastebin.com/aK8nuPL2)."""
+^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://www.reddit.com/r/geoguessr/comments/6qwn2m/introducing_the_geoguessr_series_tracking_bot/)."""
 
 #if __name__ == '__main__':
     #print(getTitle("[2] (late) Daily Challenge - July 22 (3 min timer)"))

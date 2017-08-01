@@ -7,7 +7,7 @@ def refreshScripts():
 
     while True:
         checkNewSubmissions()
-        timeToSleep = 1200
+        timeToSleep = 600
         print("Sleeping for " + str(timeToSleep / 60) + " minutes.")
         time.sleep(timeToSleep)
         print("")
