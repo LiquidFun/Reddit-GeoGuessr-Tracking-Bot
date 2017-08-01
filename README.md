@@ -6,7 +6,7 @@ Read [here](https://www.reddit.com/r/geoguessr/comments/6qwn2m/introducing_the_g
 
 ## Dependancies
 
-SQLite3, PRAW, Plotly
+SQLite3, PRAW, Plotly, Google Sheets API
 
 ## Files
 
@@ -20,7 +20,7 @@ This file should be run once when downloaded.
 
 ### CheckAndPostForSeriesSubmissions.py
 
-This file adds recent submissions to the already initialized database, may overwrite some because of new comments. Then it checks if there are any new submissions which have tracking enabled and replies to them with statisctics for that series. It quits if it replies once because of the 10 minute posting limitation for new accounts.
+This file adds recent submissions to the already initialized database, may overwrite some because of new comments. After that it checks a spreadsheet for manual overwrites of certain submissions with overwrites for the SeriesTitle attribute in the database. Then it checks if there are any new submissions which have tracking enabled and replies to them with statistics for that series. It can quit if it replies once because of the 10 minute posting limitation for new accounts.
 
 This file should be run if you want to do one check and not more. 
 

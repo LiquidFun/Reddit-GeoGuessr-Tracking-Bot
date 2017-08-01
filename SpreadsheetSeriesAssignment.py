@@ -83,11 +83,14 @@ def overwriteSeriesTitles():
 
     # Update and print series found in spreadsheet
     for row in values:
-        print('%s, %s -> %s' % (row[0], row[1], convertTitle(row[1])))
-        if convertTitle(row[1]) != '':
-            if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = ?", [row[0]]).fetchone()[0] == 1:
-                #print("Updating records")
-                cursor.execute("UPDATE ChallengeRankings SET SeriesTitle = ? WHERE SubmissionID = ?", [convertTitle(row[1]), row[0]])
+        try:
+            print('%s, %s -> %s' % (row[0], row[1], convertTitle(row[1])))
+            if convertTitle(row[1]) != '':
+                if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = ?", [row[0]]).fetchone()[0] == 1:
+                    #print("Updating records")
+                    cursor.execute("UPDATE ChallengeRankings SET SeriesTitle = ? WHERE SubmissionID = ?", [convertTitle(row[1]), row[0]])
+        except IndexError:
+            pass
 
     database.commit()
     database.close()

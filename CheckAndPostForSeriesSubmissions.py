@@ -14,6 +14,7 @@ from AddScoresToDatabase import getInfoLine
 from AddScoresToDatabase import getTotalGameCount
 from AddScoresToDatabase import getTotalSeriesCount
 from AddScoresToDatabase import getSeriesEntries
+from SpreadsheetSeriesAssignment import overwriteSeriesTitles
 from InitDatabase import getRedditInstance
 #import datetime
 import operator
@@ -67,6 +68,10 @@ def checkNewSubmissions():
     print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
 
     addToDatabase(submissionList)
+
+    print(str(datetime.now() - startTime) + ": Overwriting the SeriesTitle of posts found in the google sheet. ")    
+
+    overwriteSeriesTitles()
 
     print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
 
