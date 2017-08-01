@@ -2,6 +2,9 @@ import praw
 import re
 from datetime import datetime
 from AddScoresToDatabase import addToDatabase
+from AddScoresToDatabase import getTotalGameCount
+from AddScoresToDatabase import getTotalSeriesCount
+from AddScoresToDatabase import getSeriesEntries
 #import datetime
 import operator
 
@@ -69,9 +72,10 @@ def runScript():
     # Add the statistics to the database
     addToDatabase(submissionList)
 
-    print(str(datetime.now() - startTime) + ": Added " + str(cursor.execute("SELECT COUNT(*) FROM ChallengeRankings").fetchone()[0]) + " challenges.")
-    print(str(datetime.now() - startTime) + ": Added " + str(cursor.execute("SELECT COUNT(*) FROM SeriesTracking").fetchone()[0]) + " series:")
-    print(cursor.execute("SELECT * FROM SeriesTracking"))
+    print(str(datetime.now() - startTime) + ": Added " + getTotalGameCount() + " challenges.")
+    print(str(datetime.now() - startTime) + ": Added " + getTotalSeriesCount() + " series:")
+    for series in getSeriesEntries():
+        print(series)
 
     # Commit the changes to the database
     database.commit()

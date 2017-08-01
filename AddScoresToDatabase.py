@@ -126,10 +126,10 @@ def addToDatabase(submissionList):
 def replyToTrackRequest(comment, positive):
     if positive == True:
         print("I will be tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
-        comment.reply("""I will be tracking this series from now on. %s""" % [getInfoLine()])
+        comment.reply("""I will be tracking this series from now on. """ + getInfoLine())
     else:
         print("I will stop tracking this series: " + getTitle(comment.submission) + " because of this comment " + comment.fullname)
-        comment.reply("""I will stop tracking this series from now on. %s""" % [getInfoLine()])
+        comment.reply("""I will stop tracking this series from now on. """ + getInfoLine())
 
 # Get the username of the bot which is currently logged in
 def getBotUsername():
@@ -161,6 +161,25 @@ def getSubmissionDateFromDatabase(submission):
     database = sqlite3.connect('database.db')
     cursor = database.cursor()
     return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = ?", [str(submission.id)]).fetchone()[0]
+    database.close()
+
+def getTotalGameCount():
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
+    return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings").fetchone()[0]
+    database.close()
+
+def getTotalSeriesCount():
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
+    return cursor.execute("SELECT COUNT(*) FROM SeriesTracking").fetchone()[0]
+    database.close()
+
+def getSeriesEntries():
+    database = sqlite3.connect('database.db')
+    cursor = database.cursor()
+    return cursor.execute("SELECT * FROM SeriesTracking")
+    database.close()
 
 def getInfoLine():
     return """

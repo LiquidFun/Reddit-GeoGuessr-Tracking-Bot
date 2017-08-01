@@ -11,6 +11,9 @@ from AddScoresToDatabase import getSeriesDateFromDatabase
 from AddScoresToDatabase import getSubmissionDateFromDatabase
 from AddScoresToDatabase import getGameCountInSeriesSoFar
 from AddScoresToDatabase import getInfoLine
+from AddScoresToDatabase import getTotalGameCount
+from AddScoresToDatabase import getTotalSeriesCount
+from AddScoresToDatabase import getSeriesEntries
 from InitDatabase import getRedditInstance
 #import datetime
 import operator
@@ -59,7 +62,7 @@ def checkNewSubmissions():
 
     print(str(datetime.now() - startTime) + ": Acquiring submission list. ")
 
-    submissionList = subreddit.new(limit = 10)
+    submissionList = subreddit.new(limit = 100)
 
     print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
 
@@ -67,9 +70,15 @@ def checkNewSubmissions():
 
     print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
 
-    submissionList = subreddit.new(limit = 10)
+    submissionList = subreddit.new(limit = 300)
 
     checkForSeriesSubmissions(submissionList)
+
+    print("Found %s games in total: " % [getTotalGameCount()])
+
+    print("Found %s series in total: " % [getTotalSeriesCount()])
+    for series in getSeriesEntries():
+        print(series)
             
     # Print how long it took
     print(str(datetime.now() - startTime) + ": Finished. ")    
