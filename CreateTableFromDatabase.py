@@ -39,6 +39,23 @@ def getRankingsFromDatabase(submission):
     #print(table)
     return table
 
+def getTableOfSeriesGamesFromDatabase(SeriesTitle):
+
+    # Connect to database
+    database = sqlite3.connect("database.db")
+    cursor = database.cursor()
+
+    table = []
+
+    for row in cursor.execute("SELECT SubmissionID, SubmissionTitle, Place1, Place2, Place3 FROM ChallengeRankings WHERE SeriesTitle = ?", [SeriesTitle]):
+        table.append(row)
+
+    database.close()
+
+    #print(table)
+    return table
+
 if __name__ == '__main__':
-    reddit = getRedditInstance()
-    print(getRankingsFromDatabase(reddit.submission(id = '6fe4fi')))
+    #reddit = getRedditInstance()
+    #print(getRankingsFromDatabase(reddit.submission(id = '6fe4fi')))
+    print(getTableOfSeriesGamesFromDatabase("roadslesstravelled"))

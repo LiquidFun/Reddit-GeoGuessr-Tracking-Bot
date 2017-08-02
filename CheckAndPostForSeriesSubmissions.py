@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from CreateAndUploadPlots import createAndUploadPlots
 from CreateTableFromDatabase import getRankingsFromDatabase
+from CreateTableFromDatabase import getTableOfSeriesGamesFromDatabase
 from AddScoresToDatabase import getTitle
 from AddScoresToDatabase import getDate
 from AddScoresToDatabase import addToDatabase
@@ -16,6 +17,7 @@ from AddScoresToDatabase import getTotalSeriesCount
 from AddScoresToDatabase import getSeriesEntries
 from SpreadsheetSeriesAssignment import overwriteSeriesTitles
 from InitDatabase import getRedditInstance
+from PasteToPastebin import pasteToPastebin
 #import datetime
 import operator
 
@@ -142,18 +144,32 @@ def replyTrackedStats(submission):
                 text += '|' + str(val)
         text += '\n'
 
-    url = createAndUploadPlots(table, "%s %s" % (getFancyTitle(submission), getNumberFromTitle(submission)))
+    plotlyUrl = createAndUploadPlots(table, "%s %s" % (getFancyTitle(submission), getNumberFromTitle(submission)))
 
     gameCount = getGameCountInSeriesSoFar(submission, False)
 
-    #submission.reply
-    print("""I have found %s challenges in this series so far:
+
+    pastebinText = ""
+    for row in getTableOfSeriesGamesFromDatabase(getTitle(submission)):
+        for val in row:
+            pastebinText += val + ', '
+            #print(val)
+        pastebinText += '\n'
+
+    #print(pastebinText)
+
+    # Create a paste with a list with all submissions in that series
+    pastebinLink = pasteToPastebin("Challenges in series " + getTitle(submission), pastebinText)
+
+    #pastebinLink = ""
+
+    submission.reply("""I have found [%s](%s) challenges in this series so far:
 
 Ranking|User|1st|2nd|3rd
 :--|:--|:--|:--|:--
 %s 
 
-[Here](%s) is a visualization of the current rankings. %s""" % (gameCount, text, url, getInfoLine()))
+[Here](%s) is a visualization of the current rankings. %s""" % (gameCount, str(pastebinLink)[2:len(str(pastebinLink)) - 1], text, plotlyUrl, getInfoLine()))
 
 # Get the postfix st, nd, rd or th for a number
 def getPostFix(index):
@@ -169,6 +185,6 @@ def getPostFix(index):
     database.close()
 
 if __name__ == '__main__':
-    checkNewSubmissions()
+    #checkNewSubmissions()
     #reddit = getRedditInstance()
-    #replyTrackedStats(reddit.submission(id = '6qoini'))
+    replyTrackedStats(getRedditInstance().submission(id = '6qoini'))
