@@ -163,13 +163,16 @@ def replyTrackedStats(submission):
 
     #pastebinLink = ""
 
-    submission.reply("""I have found [%s](%s) challenges in this series so far:
+    commentText = ("""I have found [%s](%s) challenges in this series so far (excluding the current one):
 
 Ranking|User|1st|2nd|3rd
 :--|:--|:--|:--|:--
 %s 
 
 [Here](%s) is a visualization of the current rankings. %s""" % (gameCount, str(pastebinLink)[2:len(str(pastebinLink)) - 1], text, plotlyUrl, getInfoLine()))
+
+    submission.reply(commentText)
+    print(commentText)
 
 # Get the postfix st, nd, rd or th for a number
 def getPostFix(index):

@@ -37,3 +37,21 @@ This file should be run once on every startup as it continually looks for new su
 ---
 
 All other files are for internal use and usually don't need running. In case you want to understand them you can look at the comments in the files themselves.
+
+## API files
+
+### RedditAPIAccess.txt
+
+1. client_id
+2. client_secret
+3. Reddit Username
+4. Reddit Password
+
+### PlotlyAPIAccess.txt
+
+1. Username
+2. API key
+
+### PastebinAPIAccess.txt
+
+1. API dev key
