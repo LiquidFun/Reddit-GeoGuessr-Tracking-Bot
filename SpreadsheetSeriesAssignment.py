@@ -1,6 +1,6 @@
 from __future__ import print_function
 import httplib2
-import os
+import sys, os
 
 import re
 
@@ -11,12 +11,12 @@ from oauth2client.file import Storage
 
 import sqlite3
 
-from AddScoresToDatabase import convertTitle
+from .AddScoresToDatabase import convertTitle
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/sheets.googleapis.com-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
-CLIENT_SECRET_FILE = 'client_secret.json'
+CLIENT_SECRET_FILE = os.path.join(os.path.dirname(__file__), 'client_secret.json')
 APPLICATION_NAME = 'GeoGuessr Tracker Bot'
 
 try:
@@ -78,7 +78,7 @@ def overwriteSeriesTitles():
     values = result.get('values', [])
 
     # Connect to database
-    database = sqlite3.connect("database.db")
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), "database.db"))
     cursor = database.cursor()
 
     # Update and print series found in spreadsheet

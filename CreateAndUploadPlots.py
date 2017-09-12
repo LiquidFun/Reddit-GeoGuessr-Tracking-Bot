@@ -1,13 +1,16 @@
 import plotly.plotly as py
 import plotly.graph_objs as go
 #import plotly.offline as offline
-from CreateTableFromDatabase import getRankingsFromDatabase
+
+import sys, os
+
+from .CreateTableFromDatabase import getRankingsFromDatabase
 
 # Using the plotly API creates a few plots
 def createAndUploadPlots(table, plotName):
 
     # Read plotly username and API key from file (to avoid accidentally publishing it)
-    inputFile = open("PlotlyAPIAccess.txt")
+    inputFile = open(os.path.join(os.path.dirname(__file__), "PlotlyAPIAccess.txt"))
     lines = []
     for line in inputFile:
         lines.append(line)

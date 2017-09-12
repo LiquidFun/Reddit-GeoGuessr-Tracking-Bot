@@ -1,23 +1,25 @@
 import praw
 import re
+
+import sys, os
 from datetime import datetime
-from CreateAndUploadPlots import createAndUploadPlots
-from CreateTableFromDatabase import getRankingsFromDatabase
-from CreateTableFromDatabase import getTableOfSeriesGamesFromDatabase
-from AddScoresToDatabase import getTitle
-from AddScoresToDatabase import getDate
-from AddScoresToDatabase import addToDatabase
-from AddScoresToDatabase import getBotUsername
-from AddScoresToDatabase import getSeriesDateFromDatabase
-from AddScoresToDatabase import getSubmissionDateFromDatabase
-from AddScoresToDatabase import getGameCountInSeriesSoFar
-from AddScoresToDatabase import getInfoLine
-from AddScoresToDatabase import getTotalGameCount
-from AddScoresToDatabase import getTotalSeriesCount
-from AddScoresToDatabase import getSeriesEntries
-from SpreadsheetSeriesAssignment import overwriteSeriesTitles
-from InitDatabase import getRedditInstance
-from PasteToPastebin import pasteToPastebin
+from .CreateAndUploadPlots import createAndUploadPlots
+from .CreateTableFromDatabase import getRankingsFromDatabase
+from .CreateTableFromDatabase import getTableOfSeriesGamesFromDatabase
+from .AddScoresToDatabase import getTitle
+from .AddScoresToDatabase import getDate
+from .AddScoresToDatabase import addToDatabase
+from .AddScoresToDatabase import getBotUsername
+from .AddScoresToDatabase import getSeriesDateFromDatabase
+from .AddScoresToDatabase import getSubmissionDateFromDatabase
+from .AddScoresToDatabase import getGameCountInSeriesSoFar
+from .AddScoresToDatabase import getInfoLine
+from .AddScoresToDatabase import getTotalGameCount
+from .AddScoresToDatabase import getTotalSeriesCount
+from .AddScoresToDatabase import getSeriesEntries
+from .SpreadsheetSeriesAssignment import overwriteSeriesTitles
+from .InitDatabase import getRedditInstance
+from .PasteToPastebin import pasteToPastebin
 #import datetime
 import operator
 
@@ -93,7 +95,7 @@ def checkNewSubmissions():
 
 # Check the submissionList for submissions for posts whose series is on the tracking list
 def checkForSeriesSubmissions(submissionList):
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
 
     botUsername = getBotUsername()

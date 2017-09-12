@@ -1,10 +1,12 @@
 import praw
 import re
 from datetime import datetime
-from AddScoresToDatabase import addToDatabase
-from AddScoresToDatabase import getTotalGameCount
-from AddScoresToDatabase import getTotalSeriesCount
-from AddScoresToDatabase import getSeriesEntries
+from .AddScoresToDatabase import addToDatabase
+from .AddScoresToDatabase import getTotalGameCount
+from .AddScoresToDatabase import getTotalSeriesCount
+from .AddScoresToDatabase import getSeriesEntries
+
+import sys, os
 #import datetime
 import operator
 
@@ -12,7 +14,7 @@ import sqlite3
 
 def getRedditInstance():
     # Read reddit client_id and client_secret from file (to avoid accidentally publishing it)
-    inputFile = open("RedditAPIAccess.txt")
+    inputFile = open(os.path.join(os.path.dirname(__file__), "RedditAPIAccess.txt"))
     lines = []
     for line in inputFile:
         lines.append(line)
@@ -55,7 +57,7 @@ def runScript():
     print(str(datetime.now() - startTime) + ": Opening SQL Database. ")
 
     # Open the database
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
 
     print(str(datetime.now() - startTime) + ": Creating the SQL table. ")

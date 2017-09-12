@@ -1,15 +1,18 @@
 import sqlite3
 import operator
-from AddScoresToDatabase import getTitle
-from AddScoresToDatabase import getDate
-from InitDatabase import getRedditInstance
-from AddScoresToDatabase import getSubmissionDateFromDatabase
+
+import sys, os
+
+from .AddScoresToDatabase import getTitle
+from .AddScoresToDatabase import getDate
+from .InitDatabase import getRedditInstance
+from .AddScoresToDatabase import getSubmissionDateFromDatabase
 
 # Create a table with the rankings from the local database for a series up until a specific submission excluding that submission
 def getRankingsFromDatabase(submission):
     
     # Connect to database
-    database = sqlite3.connect("database.db")
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), "database.db"))
     cursor = database.cursor()
 
     # Create a set with all the usernames in that series
@@ -42,7 +45,7 @@ def getRankingsFromDatabase(submission):
 def getTableOfSeriesGamesFromDatabase(SeriesTitle):
 
     # Connect to database
-    database = sqlite3.connect("database.db")
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), "database.db"))
     cursor = database.cursor()
 
     table = []

@@ -1,10 +1,10 @@
 import urllib.parse
 import urllib.request
- 
+import sys, os
 
 def pasteToPastebin(name, text):
 
-    pastebin_API_file = open("PastebinAPIAccess.txt")
+    pastebin_API_file = open(os.path.join(os.path.dirname(__file__), "PastebinAPIAccess.txt"))
     lines = []
     for line in pastebin_API_file:
         lines.append(line)

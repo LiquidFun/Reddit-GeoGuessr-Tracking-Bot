@@ -3,6 +3,8 @@ import re
 from datetime import datetime
 import operator
 
+import sys, os
+
 import sqlite3
 
 def getDate(submission):
@@ -33,7 +35,7 @@ def addToDatabase(submissionList):
     # Measure time
     startTime = datetime.now()
 
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
 
     #reddit = getRedditInstance()
@@ -133,7 +135,7 @@ def replyToTrackRequest(comment, positive):
 
 # Get the username of the bot which is currently logged in
 def getBotUsername():
-    inputFile = open("RedditAPIAccess.txt")
+    inputFile = open(os.path.join(os.path.dirname(__file__), "RedditAPIAccess.txt"))
     lines = []
     for line in inputFile:
         lines.append(line)
@@ -141,7 +143,7 @@ def getBotUsername():
 
 # Count the number of games in a series up until that post
 def getGameCountInSeriesSoFar(submission, includeSubmission):
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
     sign = '<'
     if includeSubmission:
@@ -151,32 +153,32 @@ def getGameCountInSeriesSoFar(submission, includeSubmission):
 
 # Get the date when the series was added to the database
 def getSeriesDateFromDatabase(submission):
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
     return cursor.execute("SELECT StartDate FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)]).fetchone()[0]
     database.close()
 
 # Get the date in the database for the submission (getDate(submission) and the date in the submission are different for whatever reason so this comparison is more acurate)
 def getSubmissionDateFromDatabase(submission):
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
     return cursor.execute("SELECT Date FROM ChallengeRankings WHERE SubmissionID = ?", [str(submission.id)]).fetchone()[0]
     database.close()
 
 def getTotalGameCount():
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
     return cursor.execute("SELECT COUNT(*) FROM ChallengeRankings").fetchone()[0]
     database.close()
 
 def getTotalSeriesCount():
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
     return cursor.execute("SELECT COUNT(*) FROM SeriesTracking").fetchone()[0]
     database.close()
 
 def getSeriesEntries():
-    database = sqlite3.connect('database.db')
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), 'database.db'))
     cursor = database.cursor()
     return cursor.execute("SELECT * FROM SeriesTracking")
     database.close()
