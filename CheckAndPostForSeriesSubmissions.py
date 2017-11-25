@@ -171,7 +171,9 @@ Ranking|User|1st|2nd|3rd
 :--|:--|:--|:--|:--
 %s 
 
-[Here](%s) is a visualization of the current rankings. %s""" % (gameCount, str(pastebinLink)[2:len(str(pastebinLink)) - 1], text, plotlyUrl, getInfoLine()))
+[Here](%s) is a visualization of the current rankings.
+
+Please post your entire score as a top-level reddit comment to have it counted (i.e. if you do a thorough explanation for each round still write your full score somewhere in your comment) %s""" % (gameCount, str(pastebinLink)[2:len(str(pastebinLink)) - 1], text, plotlyUrl, getInfoLine()))
 
     submission.reply(commentText)
     print(commentText)

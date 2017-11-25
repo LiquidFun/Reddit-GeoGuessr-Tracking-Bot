@@ -84,7 +84,7 @@ def overwriteSeriesTitles():
     # Update and print series found in spreadsheet
     for row in values:
         try:
-            print('%s, %s -> %s' % (row[0], row[1], convertTitle(row[1])))
+            #print('%s, %s -> %s' % (row[0], row[1], convertTitle(row[1])))
             if convertTitle(row[1]) != '':
                 if cursor.execute("SELECT COUNT(*) FROM ChallengeRankings WHERE SubmissionID = ?", [row[0]]).fetchone()[0] == 1:
                     #print("Updating records")

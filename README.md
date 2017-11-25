@@ -55,3 +55,7 @@ All other files are for internal use and usually don't need running. In case you
 ### PastebinAPIAccess.txt
 
 1. API dev key
+
+### client_secret.json (Google Spreadsheet API)
+
+Get this file from your google spreadsheet API page
