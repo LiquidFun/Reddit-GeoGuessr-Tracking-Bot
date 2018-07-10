@@ -74,8 +74,8 @@ def runScript():
     # Add the statistics to the database
     addToDatabase(submissionList)
 
-    print(str(datetime.now() - startTime) + ": Added " + getTotalGameCount() + " challenges.")
-    print(str(datetime.now() - startTime) + ": Added " + getTotalSeriesCount() + " series:")
+    print(str(datetime.now() - startTime) + ": Added " + str(getTotalGameCount()) + " challenges.")
+    print(str(datetime.now() - startTime) + ": Added " + str(getTotalSeriesCount()) + " series:")
     for series in getSeriesEntries():
         print(series)
 

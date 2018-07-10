@@ -1,6 +1,6 @@
 import plotly.plotly as py
 import plotly.graph_objs as go
-#import plotly.offline as offline
+import plotly.offline as offline
 
 import sys, os
 
@@ -53,8 +53,8 @@ def createAndUploadPlots(table, plotName):
 
     fig = go.Figure(data=data, layout=layout)
     #py.image.save_as(fig, filename='plot.png')
+    offline.plot(fig, image = 'png', filename = 'plot.html')
     return py.plot(fig, filename = plotName + '.png', auto_open=False)
-    #offline.plot(fig, image = 'png', filename = 'plot.html')
 
 
 if __name__ == '__main__':
