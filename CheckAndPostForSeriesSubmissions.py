@@ -129,7 +129,7 @@ def checkForSeriesSubmissions(submissionList):
     database.close()
 
 # Reply to a post which has tracking enabled with the statistics of the series up until that post excluding itself
-def replyTrackedStats(submission):
+def replyTrackedStats(submission, onlyConsoleOutput = False):
 
     table = getRankingsFromDatabase(submission)
     text = ""
@@ -175,7 +175,8 @@ Ranking|User|1st|2nd|3rd
 
 Please post your entire score as a top-level reddit comment to have it counted (i.e. if you do a thorough explanation for each round still write your full score somewhere in your comment) %s""" % (gameCount, str(pastebinLink)[2:len(str(pastebinLink)) - 1], text, getInfoLine()))
 
-    submission.reply(commentText)
+    if not onlyConsoleOutput:
+        submission.reply(commentText)
     print(commentText)
 
 # Get the postfix st, nd, rd or th for a number
