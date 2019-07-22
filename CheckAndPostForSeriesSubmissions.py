@@ -67,7 +67,8 @@ def checkNewSubmissions():
 
     print(str(datetime.now() - startTime) + ": Acquiring submission list. ")
 
-    submissionList = subreddit.new(limit = 100)
+    # This line is required for some reason
+    submissionList = subreddit.new(limit = 1000)
 
     print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
 
@@ -79,7 +80,8 @@ def checkNewSubmissions():
 
     print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
 
-    submissionList = subreddit.new(limit = 100)
+    # This line is required for some reason II
+    submissionList = subreddit.new(limit = 1000)
 
     checkForSeriesSubmissions(submissionList)
 
@@ -146,7 +148,7 @@ def replyTrackedStats(submission):
                 text += '|' + str(val)
         text += '\n'
 
-    plotlyUrl = createAndUploadPlots(table, "%s %s" % (getFancyTitle(submission), getNumberFromTitle(submission)))
+    #plotlyUrl = createAndUploadPlots(table, "%s %s" % (getFancyTitle(submission), getNumberFromTitle(submission)))
 
     gameCount = getGameCountInSeriesSoFar(submission, False)
 
@@ -171,9 +173,7 @@ Ranking|User|1st|2nd|3rd
 :--|:--|:--|:--|:--
 %s 
 
-[Here](%s) is a visualization of the current rankings.
-
-Please post your entire score as a top-level reddit comment to have it counted (i.e. if you do a thorough explanation for each round still write your full score somewhere in your comment) %s""" % (gameCount, str(pastebinLink)[2:len(str(pastebinLink)) - 1], text, plotlyUrl, getInfoLine()))
+Please post your entire score as a top-level reddit comment to have it counted (i.e. if you do a thorough explanation for each round still write your full score somewhere in your comment) %s""" % (gameCount, str(pastebinLink)[2:len(str(pastebinLink)) - 1], text, getInfoLine()))
 
     submission.reply(commentText)
     print(commentText)
