@@ -42,6 +42,8 @@ def addToDatabase(submissionList):
 
     botUsername = getBotUsername()
 
+    blacklistedUsers = {a[0] for a in cursor.execute("SELECT Username FROM BlacklistedUsers")}
+
     # Get top level comments from submissions and get their first numbers with regex
     for submission in reversed(list(submissionList)):
         scoresInChallenge = [[-1, ''], [-2, ''], [-3, ''], [-4, '']] 
@@ -86,15 +88,21 @@ def addToDatabase(submissionList):
             if topLevelComment is not None:
                 body = topLevelComment.body.lower()
 
-            # Avoid comments which do not post their own score; Get the highest number in each comment and add it to the list with the user's username
-            if all(string not in body for string in doesNotHave) and topLevelComment is not None and topLevelComment.author is not None:
-                try:
-                    number = max([int(number.replace(',', '')) for number in re.findall('(?<!round )(?<!~~)(?<!\w)\d+\,?\d+', topLevelComment.body)])
-                except (IndexError, ValueError) as e:
-                    number = -1
-                    pass
-                if 0 <= number <= 32395:
-                    scoresInChallenge.append([int(number), topLevelComment.author.name])
+            # Avoid comments which do not post their own score or are blacklisted
+            # Get the highest number in each comment and add it to the list with the user's username
+            if (all(string not in body for string in doesNotHave) 
+                    and topLevelComment is not None 
+                    and topLevelComment.author is not None):
+                if topLevelComment.author.name not in blacklistedUsers:
+                    try:
+                        number = max([int(number.replace(',', '')) for number in re.findall('(?<!round )(?<!~~)(?<!\w)\d+\,?\d+', topLevelComment.body)])
+                    except (IndexError, ValueError) as e:
+                        number = -1
+                        pass
+                    if 0 <= number <= 32395:
+                        scoresInChallenge.append([int(number), topLevelComment.author.name])
+                else:
+                    print("Ignoring blacklisted user's " + topLevelComment.author.name + " score in submission " + str(submission.id))
         scoresInChallenge.sort(key = operator.itemgetter(0), reverse = True)
 
         # If two players have the same score add the second one to the authors of the first challenge with a pipe character inbetween
@@ -190,5 +198,8 @@ def getInfoLine():
 
 ^(I'm a bot, message the author: /u/LiquidProgrammer if I made a mistake.) ^[Usage](https://www.reddit.com/r/geoguessr/comments/6qwn2m/introducing_the_geoguessr_series_tracking_bot/)."""
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
+    pass
+    #reddit = getRedditInstance()
+    #addToDatabase([reddit.submission(id="gdru3q")])
     #print(getTitle("[2] (late) Daily Challenge - July 22 (3 min timer)"))

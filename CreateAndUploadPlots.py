@@ -58,4 +58,4 @@ def createAndUploadPlots(table, plotName):
 
 
 if __name__ == '__main__':
-    print(createAndUplaodPlots(getRankingsFromDatabase("statelands"), "statelands"))
+    print(createAndUploadPlots(getRankingsFromDatabase("statelands"), "statelands"))

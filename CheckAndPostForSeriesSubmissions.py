@@ -3,7 +3,7 @@ import re
 
 import sys, os
 from datetime import datetime
-from .CreateAndUploadPlots import createAndUploadPlots
+# from .CreateAndUploadPlots import createAndUploadPlots
 from .CreateTableFromDatabase import getRankingsFromDatabase
 from .CreateTableFromDatabase import getTableOfSeriesGamesFromDatabase
 from .AddScoresToDatabase import getTitle
@@ -18,6 +18,7 @@ from .AddScoresToDatabase import getTotalGameCount
 from .AddScoresToDatabase import getTotalSeriesCount
 from .AddScoresToDatabase import getSeriesEntries
 from .SpreadsheetSeriesAssignment import overwriteSeriesTitles
+from .SpreadsheetSeriesAssignment import overwriteBlacklistedUsers
 from .InitDatabase import getRedditInstance
 from .PasteToPastebin import pasteToPastebin
 #import datetime
@@ -70,16 +71,16 @@ def checkNewSubmissions():
     # This line is required for some reason
     submissionList = subreddit.new(limit = 1000)
 
-    print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
+    print(str(datetime.now() - startTime) + ": Overwriting the table of blacklisted users.")    
+    overwriteBlacklistedUsers()
 
+    print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
     addToDatabase(submissionList)
 
     print(str(datetime.now() - startTime) + ": Overwriting the SeriesTitle of posts found in the google sheet. ")    
-
     overwriteSeriesTitles()
 
     print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
-
     # This line is required for some reason II
     submissionList = subreddit.new(limit = 1000)
 

@@ -95,6 +95,47 @@ def overwriteSeriesTitles():
     database.commit()
     database.close()
 
+def overwriteBlacklistedUsers():
+    """
+    Link to sheet:
+    https://docs.google.com/spreadsheets/d/1KAPNJKmc5o5pbCs1cmjymLRMHPAyb2_uX0Dqbcf2sUw/edit?usp=sharing
+    """
+
+    print("Opening spreadsheet to get blacklisted users.")
+
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
+                    'version=v4')
+    service = discovery.build('sheets', 'v4', http=http,
+                              discoveryServiceUrl=discoveryUrl)
+
+    # Set basic info about the spreadsheet
+    SHEET_ID = '1KAPNJKmc5o5pbCs1cmjymLRMHPAyb2_uX0Dqbcf2sUw'
+    RANGE_NAME = 'Blacklist!A2:A'
+
+    # Get results from spreadsheet    
+    result = service.spreadsheets().values().get(spreadsheetId=SHEET_ID, range=RANGE_NAME).execute()
+    values = result.get('values', [])
+    print(values)
+
+    # Connect to database
+    database = sqlite3.connect(os.path.join(os.path.dirname(__file__), "database.db"))
+    cursor = database.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS BlacklistedUsers")
+    cursor.execute("CREATE TABLE BlacklistedUsers (Username PRIMARY KEY)")
+    for row in values:
+        try:
+            username = row[0]
+            print('Adding blacklisted user "' + username + '"')
+            cursor.execute("INSERT OR REPLACE INTO BlacklistedUsers VALUES (?)", [username])
+        except IndexError:
+            pass
+
+    database.commit()
+    database.close()
+
 
 if __name__ == '__main__':
-    overwriteSeriesTitles()
+    overwriteBlacklistedUsers()
