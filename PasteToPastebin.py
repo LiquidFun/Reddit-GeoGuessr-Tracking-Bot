@@ -11,7 +11,7 @@ def pasteToPastebin(name, text):
 
     #print(lines[0])
 
-    url = "http://pastebin.com/api/api_post.php"
+    url = "https://pastebin.com/api/api_post.php"
     values = {'api_option' : 'paste',
                'api_dev_key' : lines[0].strip(),
                'api_paste_code' : text,
@@ -31,4 +31,4 @@ def pasteToPastebin(name, text):
     return the_page
 
 if __name__ == '__main__':
-    pasteToPastebin("Some name", "Test1\n\nTExt2\tTe33")
+    print(pasteToPastebin("Some name", "Test1\n\nTExt2\tTe33"))
