@@ -105,6 +105,7 @@ def checkForSeriesSubmissions(submissionList):
 
     #print(botUsername)
 
+    submission.comments.replace_more(limit=0)
     # For each submission check if it's title is in the series tracking list. Then check if the bot has already replied to that post
     for submission in submissionList:
         if cursor.execute("SELECT COUNT(*) FROM SeriesTracking WHERE SeriesTitle = ?", [getTitle(submission)]).fetchone()[0] != 0:
