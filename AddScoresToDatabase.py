@@ -43,10 +43,10 @@ def addToDatabase(submissionList):
     botUsername = getBotUsername()
 
     blacklistedUsers = {a[0] for a in cursor.execute("SELECT Username FROM BlacklistedUsers")}
-    submission.comments.replace_more(limit=0)
 
     # Get top level comments from submissions and get their first numbers with regex
     for submission in reversed(list(submissionList)):
+        submission.comments.replace_more(limit=0)
         scoresInChallenge = [[-1, ''], [-2, ''], [-3, ''], [-4, '']] 
         for topLevelComment in submission.comments:
 
