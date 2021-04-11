@@ -64,37 +64,38 @@ def checkNewSubmissions():
     #cursor.commit()
 
     reddit = getRedditInstance()
-    subreddit = reddit.subreddit("geoguessr")
+    for subredditName in ["geoguessr", "geochallenges"]:
+        subreddit = reddit.subreddit(subredditName)
 
-    print(str(datetime.now() - startTime) + ": Acquiring submission list. ")
+        print(str(datetime.now() - startTime) + ": Acquiring submission list. ")
 
-    # This line is required for some reason
-    submissionList = subreddit.new(limit = 1000)
+        # This line is required for some reason
+        submissionList = subreddit.new(limit = 1000)
 
-    print(str(datetime.now() - startTime) + ": Overwriting the table of blacklisted users.")    
-    overwriteBlacklistedUsers()
+        print(str(datetime.now() - startTime) + ": Overwriting the table of blacklisted users.")    
+        overwriteBlacklistedUsers()
 
-    print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
-    addToDatabase(submissionList)
+        print(str(datetime.now() - startTime) + ": Adding new submissions to the database. ")    
+        addToDatabase(submissionList)
 
-    print(str(datetime.now() - startTime) + ": Overwriting the SeriesTitle of posts found in the google sheet. ")    
-    overwriteSeriesTitles()
+        print(str(datetime.now() - startTime) + ": Overwriting the SeriesTitle of posts found in the google sheet. ")    
+        overwriteSeriesTitles()
 
-    print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
-    # This line is required for some reason II
-    submissionList = subreddit.new(limit = 1000)
+        print(str(datetime.now() - startTime) + ": Checking for new posts which have tracking enabled. ")    
+        # This line is required for some reason II
+        submissionList = subreddit.new(limit = 1000)
 
-    checkForSeriesSubmissions(submissionList)
+        checkForSeriesSubmissions(submissionList)
 
-    print("Found %s games in total: " % [getTotalGameCount()])
+        print("Found %s games in total: " % [getTotalGameCount()])
 
-    print("Found %s series in total: " % [getTotalSeriesCount()])
-    for series in getSeriesEntries():
-        print(series)
-            
-    # Print how long it took
-    print(str(datetime.now() - startTime) + ": Finished. ")    
-    print(datetime.now())
+        print("Found %s series in total: " % [getTotalSeriesCount()])
+        for series in getSeriesEntries():
+            print(series)
+                
+        # Print how long it took
+        print(str(datetime.now() - startTime) + ": Finished. ")    
+        print(datetime.now())
 
 # Check the submissionList for submissions for posts whose series is on the tracking list
 def checkForSeriesSubmissions(submissionList):
