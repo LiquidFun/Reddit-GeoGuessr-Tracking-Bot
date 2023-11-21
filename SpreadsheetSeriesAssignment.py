@@ -1,13 +1,12 @@
 from __future__ import print_function
-import httplib2
-import sys, os
+import os
+import pickle
 
-import re
-
-from apiclient import discovery
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
+from googleapiclient.discovery import build
+from google.auth.transport.requests import Request
+from google_auth_httplib2 import AuthorizedHttp
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.credentials import Credentials
 
 import sqlite3
 
@@ -19,39 +18,32 @@ SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
 CLIENT_SECRET_FILE = os.path.join(os.path.dirname(__file__), 'client_secret.json')
 APPLICATION_NAME = 'GeoGuessr Tracker Bot'
 
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
-
 def get_credentials():
     """Gets valid user credentials from storage.
-
-    If nothing has been stored, or if the stored credentials are invalid,
+    If nothing has been stored, or if the stored credentials are invalid or expired,
     the OAuth2 flow is completed to obtain the new credentials.
 
     Returns:
         Credentials, the obtained credential.
     """
-    home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
-    if not os.path.exists(credential_dir):
-        os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
-                                   'sheets.googleapis.com-python-quickstart.json')
-
-    store = Storage(credential_path)
-    credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
-        print('Storing credentials to ' + credential_path)
-    return credentials
+    creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    token_path = os.path.join(os.path.dirname(__file__), 'token.json')
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(CLIENT_SECRET_FILE, SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open(token_path, 'w') as token:
+            token.write(creds.to_json())
+    return creds
 
 def overwriteSeriesTitles():
     """
@@ -62,12 +54,15 @@ def overwriteSeriesTitles():
 
     print("Opening spreadsheet to get overwrites.")
 
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
-                    'version=v4')
-    service = discovery.build('sheets', 'v4', http=http,
-                              discoveryServiceUrl=discoveryUrl)
+    # credentials = get_credentials()
+    # http = credentials.authorize(httplib2.Http())
+    creds = get_credentials()
+    http = AuthorizedHttp(creds)
+    service = build('sheets', 'v4', http=http, cache_discovery=False)
+    # discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
+    #                 'version=v4')
+    # service = discovery.build('sheets', 'v4', http=http,
+    #                           discoveryServiceUrl=discoveryUrl)
 
     # Set basic info about the spreadsheet
     SHEET_ID = '16VxHWb7TwO4mICr42LIP8RuWRsr-rFD2040hUqdb_yY'
@@ -103,12 +98,10 @@ def overwriteBlacklistedUsers():
 
     print("Opening spreadsheet to get blacklisted users.")
 
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
-                    'version=v4')
-    service = discovery.build('sheets', 'v4', http=http,
-                              discoveryServiceUrl=discoveryUrl)
+    creds = get_credentials()
+    http = AuthorizedHttp(creds)
+    service = build('sheets', 'v4', http=http, cache_discovery=False)
+
 
     # Set basic info about the spreadsheet
     SHEET_ID = '1KAPNJKmc5o5pbCs1cmjymLRMHPAyb2_uX0Dqbcf2sUw'
